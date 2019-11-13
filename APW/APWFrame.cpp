@@ -1,6 +1,6 @@
 #include "APWFrame.h"
 
-//#include "OptionsFrame.h"
+#include "OptionsFrame.h"
 
 #include "wx/aboutdlg.h"
 #include "wx/statline.h"
@@ -215,7 +215,6 @@ bool APWFrame::isFinished() const
 
 void APWFrame::OnOptions(wxCommandEvent& /*event*/)
 {
-	/*
 	OptionsFrame* optionsFrame = new OptionsFrame("Options", this);
 	optionsFrame->options = currentOptions;
 	if (wxID_OK == optionsFrame->ShowModal())
@@ -225,7 +224,6 @@ void APWFrame::OnOptions(wxCommandEvent& /*event*/)
 	}
 
 	delete optionsFrame;
-	*/
 }
 
 
