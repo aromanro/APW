@@ -47,7 +47,7 @@ void Options::Load()
 	wxConfigBase *conf=wxConfigBase::Get(false);
 	if (conf)
 	{
-		nrThreads = conf->ReadLong("/nrThreads", 20);
+		nrThreads = conf->ReadLong("/nrThreads", 4);
 		nrPoints = conf->ReadLong("/nrPoints", 600);
 		pathNo = conf->ReadLong("/pathNo", 7);
 	}
