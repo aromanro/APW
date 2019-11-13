@@ -6,4 +6,4 @@ https://www.cambridge.org/core/books/computational-physics/BEE73B0139D4A9993193B
 
 Work in progress!
 
-A lot of things are hardwired, the code is not cleaned up yet, there is no Options dialog box, but it works.
+A lot of things are hardwired, some things might need improvements, the code is not cleaned up yet, but it works.
