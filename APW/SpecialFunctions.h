@@ -110,9 +110,9 @@ namespace SpecialFunctions
 	public:
 		static double p(unsigned int l, double x)
 		{
-
+#define USE_BETTER_LEGENDRE
 #ifdef USE_BETTER_LEGENDRE
-			return std::legendre(l, x); // WARNING: for some reason this does not work!
+			return std::legendre(l, x);
 #else
 			if (0 == l) return 1.;
 			else if (1 == l) return x;

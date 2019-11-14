@@ -68,7 +68,9 @@ namespace APW
 					const double qjlength = qj.Length();
 
 					const double qiqj = qilength * qjlength;
-					const double cosTheta = qiqj ? qiqjscalar / qiqj : 1;
+					double cosTheta = qiqjscalar / qiqj;
+					// some numerical issues prevented using std::legendre (the other custom implementation in Legengre::p worked fine), this solves it:
+					if (isnan(cosTheta) || isinf(cosTheta) || cosTheta > 1. || cosTheta < -1) cosTheta = (cosTheta < 0 ? -1 : 1);
 
 					const double qilengthm_R = qilength * m_R;
 					const double qjlengthm_R = qjlength * m_R;
