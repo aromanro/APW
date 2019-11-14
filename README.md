@@ -9,3 +9,10 @@ Work in progress!
 A lot of things are hardwired, some things might need improvements, the code is not cleaned up yet, but it works.
 
 Description will follow on Computational Physics Blog: https://compphys.go.ro
+
+
+### PROGRAM IN ACTION
+
+[![Program video](https://img.youtube.com/vi/4qOcv9kfnYw/0.jpg)](https://youtu.be/4qOcv9kfnYw)
+
+
