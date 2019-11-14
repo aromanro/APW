@@ -212,15 +212,23 @@ namespace APW
 
 							const double det = hamiltonian.Determinant();
 
-							// interpolation could be used, but for the intent of this program, this is good enough
 							if (posE > 0 && det * oldDet < 0) // change in sign
 							{
-								const double val = E - dE / 2;
+								// linear interpolation
+								const double val = E - dE * det / (det - oldDet);
 
 								res[k].push_back(val);
 							}
-							else if (posE > 1 && abs(oldDet) < abs(olderDet) && abs(oldDet) < abs(det) && abs(oldDet) < 1E-8) // went over a small minimum
+							else if (posE > 1 && abs(oldDet) < abs(olderDet) && abs(oldDet) < abs(det) && abs(oldDet) < 1E-15) // went over a small minimum
 							{
+								// should I use quadratic interpolation here?
+								// I tried but I got awful results
+
+								// if somebody wants to try, write the interpolation polynomial out of the three points:
+								// y(x) = y0(x-x1)(x-x2)/((x0-x1)(x0-x2)) + y1(x-x0)(x-x2)/((x1-x0)(x1-x2))+ y2(x-x0)(x-x1)/((x2-x0)(x2-x1)) 
+								// points: (x0, y0) = (E - 2*dE, olderDet), (x1, y1) = (E - dE, oldDet), (x2, y2) = (E, det)
+								// the minimum is where y'(x) = 0 so calculate the derivative of the polynomial, make it equal with 0, solve for x and that's the val
+
 								const double val = E - dE;
 
 								res[k].push_back(val);
