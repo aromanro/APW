@@ -272,6 +272,8 @@ void APWFrame::OnEraseBackground(wxEraseEvent& event)
 
 void APWFrame::OnExit(wxCommandEvent& /*event*/)
 {
+	StopThreads(true);
+
 	Close(true);
 }
 
