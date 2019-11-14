@@ -219,17 +219,27 @@ namespace APW
 
 								res[k].push_back(val);
 							}
-							else if (posE > 1 && abs(oldDet) < abs(olderDet) && abs(oldDet) < abs(det) && abs(oldDet) < 1E-15) // went over a small minimum
+							else if (posE > 1 && abs(oldDet) < abs(olderDet) && abs(oldDet) < abs(det) && abs(oldDet) < 1E-15 && // went over a small minimum
+								((olderDet < 0 && oldDet < 0 && det < 0) || (olderDet > 0 && oldDet > 0 && det > 0))) // all have the same sign, otherwise the sign change should be detected
 							{
-								// should I use quadratic interpolation here?
-								// I tried but I got awful results
+								// quadratic interpolation:
 
-								// if somebody wants to try, write the interpolation polynomial out of the three points:
+								// write the interpolation polynomial out of the three points:
 								// y(x) = y0(x-x1)(x-x2)/((x0-x1)(x0-x2)) + y1(x-x0)(x-x2)/((x1-x0)(x1-x2))+ y2(x-x0)(x-x1)/((x2-x0)(x2-x1)) 
 								// points: (x0, y0) = (E - 2*dE, olderDet), (x1, y1) = (E - dE, oldDet), (x2, y2) = (E, det)
 								// the minimum is where y'(x) = 0 so calculate the derivative of the polynomial, make it equal with 0, solve for x and that's the val
 
-								const double val = E - dE;
+								// TODO: check it, I derived it too fast, might have some mistakes
+								const double coef1 = olderDet * 0.5;
+								const double coef2 = -oldDet;
+								const double coef3 = det * 0.5;
+								
+								//Check:
+								// the interpolation polynomial is:
+								// y(x) = coef1 (x-x1)(x-x2) / dE^2 + coef2 (x-x0)(x-x2) / dE^2+ coef3 (x-x0)(x-x1) / dE^2 
+
+								//const double val = E - dE;
+								const double val = E - 0.5 * dE * (coef1 + 2 * coef2 + 3 * coef3) / (coef1 + coef2 + coef3);
 
 								res[k].push_back(val);
 							}
