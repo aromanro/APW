@@ -55,14 +55,16 @@ namespace APW {
 		{
 			return 200. / sqrt(2. * abs(E));
 		}
+
+		inline static double GetWavefunctionValue(size_t posIndex, double value)
+		{
+			return value;
+		}
 	protected:
 
 		const Potential& m_pot;
 	};
 
-
-	// for now Schrodinger eqn is solved using an uniform grid, I might change it to use a non uniform one
-	// for an example on how it's done, see the DftAtom project for now
 
 	class NumerovFunctionNonUniformGrid
 	{
@@ -158,6 +160,11 @@ namespace APW {
 			return Rp * exp(posIndex * m_delta) * (1. - exp(-m_delta));
 		}
 
+		inline double GetWavefunctionValue(size_t posIndex, double value) const
+		{
+			return exp(posIndex * m_delta * 0.5) * value;
+		}
+
 		inline double GetRp() const { return Rp; }
 		inline double GetDelta() const { return m_delta; }
 	protected:
@@ -236,7 +243,9 @@ namespace APW {
 					return std::numeric_limits<double>::infinity();
 			}
 			
-			return (solution - oldSolution) / function.GetDerivativeStep(steps, h) / solution;
+			const double realSolution = function.GetWavefunctionValue(steps, solution);
+
+			return (realSolution - function.GetWavefunctionValue(steps - 1, oldSolution)) / function.GetDerivativeStep(steps, h) / realSolution;
 		}
 
 		NumerovFunction function;

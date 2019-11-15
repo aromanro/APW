@@ -115,6 +115,9 @@ namespace APW
 
 		const size_t lMax = 5;
 
+		// the following two are needed for the non-uniform grid computations
+		const double deltaGrid = 0.005;
+		const double Rp = m_Rmax / (exp(numerovIntervals * deltaGrid) - 1.);
 
 		std::vector<std::vector<double>> res;
 		std::vector<std::vector<double>> ratios(numIntervals);
@@ -125,7 +128,8 @@ namespace APW
 		potential.m_potentialValues.resize(numerovGridNodes);
 		for (int i = 0; i < numerovGridNodes; ++i)
 		{
-			const double r = i * dr;
+			//const double r = i * dr; // for uniform grid
+			const double r = Rp * (exp(i * deltaGrid) - 1.);
 			potential.m_potentialValues[i] = -VeffCu(r) / r;
 		}
 
@@ -144,15 +148,18 @@ namespace APW
 			if (t == options.nrThreads - 1) nextPos = numIntervals;
 			else nextPos = startPos + step;
 
-			tasks[t] = std::async(launchType, [this, &potential, numerovGridNodes, &ratios, startPos, nextPos, minE, dE, lMax, numerovIntervals, &terminate]()->void
+			tasks[t] = std::async(launchType, [this, &potential, numerovGridNodes, &ratios, startPos, nextPos, minE, dE, lMax, numerovIntervals, deltaGrid, &terminate]()->void
 				{
-					APW::Numerov<APW::NumerovFunctionRegularGrid> numerov(potential, 0, m_Rmax, numerovGridNodes);
+					//APW::Numerov<APW::NumerovFunctionRegularGrid> numerov(potential, 0, m_Rmax, numerovGridNodes);
+					APW::Numerov<APW::NumerovFunctionNonUniformGrid> numerov(potential, deltaGrid, m_Rmax, numerovGridNodes);
+
 					for (int posE = startPos; posE < nextPos && !terminate; ++posE)
 					{
 						const double E = minE + posE * dE;
 						ratios[posE].resize(lMax + 1LL);
 						for (int l = 0; l <= lMax && !terminate; ++l)
-							ratios[posE][l] = numerov.SolveSchrodinger(m_Rmax, l, E, numerovIntervals);
+							// first parameter: pass m_Rmax for uniform grid, pass numerovIntervals for non-uniform (in this case the step is 1, so max radius is numerovIntervals)
+							ratios[posE][l] = numerov.SolveSchrodinger(/*m_Rmax*/numerovIntervals, l, E, numerovIntervals);
 					}
 				}
 			);
