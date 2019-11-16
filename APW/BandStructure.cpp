@@ -127,7 +127,7 @@ namespace APW
 		std::vector<std::vector<double>> ratios(numIntervals);
 
 		// First, compute psi'/psi at muffin boundary, for each energy
-		
+
 		APW::Potential potential;
 		potential.m_potentialValues.resize(numerovGridNodes);
 		for (int i = 0; i < numerovGridNodes; ++i)

@@ -4,16 +4,25 @@
 
 
 Options::Options()
-	: nrThreads(4), nrPoints(600), pathNo(7),
-	paths{ { {"K", "W", "X", "G", "L", "W"}, 
-			 {"L", "G", "X", "K", "G" }, 
-			 {"W", "G", "X", "W", "L", "G"}, 
-			 {"L", "G", "X", "W", "K", "G"}, 
-			 {"L", "G", "X", "U", "K", "G"}, 
-			 {"G", "X", "K", "G", "L", "K", "W", "X"}, 
-			 {"G", "X", "W", "L", "G", "K", "W", "U"},
-			 {"G", "X", "W", "L", "G", "K"},
-			 {"G", "X", "W", "G", "U", "X"}
+	: nrThreads(4), nrPoints(600), pathNo(10),
+	paths{ { 
+			{"K", "W", "X", "G", "L", "W"}, 
+			{"W", "G", "X", "W", "L", "G"}, 
+			{"W", "L", "G", "X", "W", "K"},
+			{"L", "G", "X", "K", "G" },
+			{"L", "G", "X", "W", "K", "G"},
+			{"L", "G", "X", "U", "K", "G"}, 
+			{"L", "G", "X", "U", "G"},
+			{"L", "K", "W", "G", "X", "W", "L", "G", "K"},
+			{"G", "X", "K", "G", "L", "K", "W", "X"},
+			{"G", "X", "W", "L", "G", "K", "W", "U"},
+			{"G", "X", "W", "L", "G", "K"},
+			{"G", "X", "W", "L", "G", "K", "X"},
+			{"G", "X", "W", "L", "G", "X"},
+			{"G", "X", "W", "G", "U", "X"},
+			{"G", "X", "W", "K", "L", "G"},
+			{"G", "X", "W", "K", "G", "L", "U", "W", "L", "K"},
+			{"G", "X", "U", "K", "G", "L", "W", "X"},
 		} },
 	m_fileconfig(nullptr)
 {
@@ -49,7 +58,7 @@ void Options::Load()
 	{
 		nrThreads = conf->ReadLong("/nrThreads", 4);
 		nrPoints = conf->ReadLong("/nrPoints", 600);
-		pathNo = conf->ReadLong("/pathNo", 7);
+		pathNo = conf->ReadLong("/pathNo", 10);
 	}
 }
 

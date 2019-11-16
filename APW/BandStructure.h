@@ -15,6 +15,8 @@ namespace APW
 	{
 	public:
 		// pass rmax as you want it or negative to have it computed as for touching spheres
+		// a for Cu: 6.8219117
+		// a for Al: 4.046 / 0.5291772106712 (conversion from Angstroms to Bohrs)
 		BandStructure(double a = 6.8219117, double rmax = /*2.41191*/-1.);
 
 		SymmetryPoints symmetryPoints;
