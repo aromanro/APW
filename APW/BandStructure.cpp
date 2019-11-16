@@ -12,6 +12,10 @@ namespace APW
 		G2{ 0, 3, 4, 8, 11, 12, 16, 19, 20, 24 },
 		m_a(a), m_Rmax(rmax)
 	{
+		// if the passed value was zero or negative, make them touching spheres
+		if (m_Rmax <= 0)
+			m_Rmax = sqrt(2.) * m_a / 4.;
+
 		basisVectors.reserve(137);
 	}
 

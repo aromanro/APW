@@ -14,7 +14,8 @@ namespace APW
 	class BandStructure
 	{
 	public:
-		BandStructure(double a = 6.8219117, double rmax = 2.41191);
+		// pass rmax as you want it or negative to have it computed as for touching spheres
+		BandStructure(double a = 6.8219117, double rmax = /*2.41191*/-1.);
 
 		SymmetryPoints symmetryPoints;
 
