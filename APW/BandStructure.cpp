@@ -109,8 +109,20 @@ namespace APW
 	{
 		return Z * (1. - exp(-lambda * r)) / (1. + exp(-lambda * (r - rc)));
 	}
+	
 
+	// the dumbest possible
+	// constant for R < Rl
+	// -Z/r otherwise (Z given by the number of valence electrons)
+	// don't add - or /r for this one
+	double VDumb(int Z, double R, double Rl, double C)
+	{
+		if (R < Rl) return C;
 
+		return -Z / R;
+	}
+
+	
 	std::vector<std::vector<double>> BandStructure::Compute(const std::atomic_bool& terminate, const Options& options)
 	{	
 		const double minE = -0.2;
