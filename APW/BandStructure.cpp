@@ -50,8 +50,6 @@ namespace APW
 		//const Vector3D<double> b3 = a1 % a2 / (a3 * (a1 % a2));
 		// the denominator is the volume, mentioned above
 		
-		
-
 		for (int i = -size; i <= size; ++i)
 			for (int j = -size; j <= size; ++j)
 				for (int k = -size; k <= size; ++k)
@@ -105,10 +103,19 @@ namespace APW
 					- 0.15595606773483 * R - 3.1350051440417E-3 * R2 + 5.1895222293006e-2 * R3 - 2.8027608685637E-2 * R4;
 	}
 
+	// not used but might turn useful with the proper params
+	// use it as -StarkloffJoannopoulos(...) / r as the one for Cu
+	double StarkloffJoannopoulos(int Z, double r, double lambda, double rc)
+	{
+		return Z * (1. - exp(-lambda * r)) / (1. + exp(-lambda * (r - rc)));
+	}
+
+
 	std::vector<std::vector<double>> BandStructure::Compute(const std::atomic_bool& terminate, const Options& options)
 	{	
 		const double minE = -0.2;
 		const double maxE = 0.8;
+
 		const double dE = 1E-3;
 		const int numerovIntervals = 2000;
 		const int numIntervals = static_cast<int>((maxE - minE) / dE);
