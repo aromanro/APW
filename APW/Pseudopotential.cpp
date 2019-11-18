@@ -21,8 +21,6 @@ namespace APW {
 
 	bool Pseudopotential::Load(const std::string& name)
 	{
-		//if (name == "data/li.lda.lps") return false;
-
 		std::ifstream file(name);
 
 		if (!file) return false;
