@@ -4,6 +4,9 @@
 #include "Hamiltonian.h"
 #include "Numerov.h"
 
+#include "ChemUtils.h"
+#include "Pseudopotential.h"
+
 namespace APW
 {
 
@@ -122,6 +125,11 @@ namespace APW
 		return -Z / R;
 	}
 
+
+	double VAl(double R)
+	{
+		return VDumb(3, R, 2.675, 1.3905 * 0.5);
+	}
 	
 	std::vector<std::vector<double>> BandStructure::Compute(const std::atomic_bool& terminate, const Options& options)
 	{	
@@ -147,6 +155,16 @@ namespace APW
 
 		// First, compute psi'/psi at muffin boundary, for each energy
 
+
+		// this would load a pseudopotential file
+		// there are some (local) pseudopotential files I found on GitHub, the Al file is ok for obtaining something similar with fig 6.3 from Computational Physics book
+		// it's not as good as the Cu pseudopotential for APW, the match with https://www.materialscloud.org/discover/sssp/plot/efficiency/Al is worse
+		// than that of Cu https://www.materialscloud.org/discover/sssp/plot/efficiency/Cu
+		
+		//APW::Pseudopotential pseudopotential;
+		//const bool success = pseudopotential.Load(Chemistry::ChemUtils::GetPseudopotentialFileForZ(13));
+		//assert(success && pseudopotential.GetZ() == 13);
+
 		APW::Potential potential;
 		potential.m_potentialValues.resize(numerovGridNodes);
 		for (int i = 0; i < numerovGridNodes; ++i)
@@ -154,6 +172,7 @@ namespace APW
 			//const double r = i * dr; // for uniform grid
 			const double r = Rp * (exp(i * deltaGrid) - 1.);
 			potential.m_potentialValues[i] = -VeffCu(r) / r;
+			//potential.m_potentialValues[i] = pseudopotential.Value(r);
 		}
 
 

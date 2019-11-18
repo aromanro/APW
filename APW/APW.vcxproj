@@ -173,8 +173,10 @@
     <ClCompile Include="APWFrame.cpp" />
     <ClCompile Include="APWThread.cpp" />
     <ClCompile Include="BandStructure.cpp" />
+    <ClCompile Include="ChemUtils.cpp" />
     <ClCompile Include="Options.cpp" />
     <ClCompile Include="OptionsFrame.cpp" />
+    <ClCompile Include="Pseudopotential.cpp" />
     <ClCompile Include="SymmetryPoints.cpp" />
     <ClCompile Include="wxVTKRenderWindowInteractor.cxx" />
   </ItemGroup>
@@ -183,10 +185,12 @@
     <ClInclude Include="APWFrame.h" />
     <ClInclude Include="APWThread.h" />
     <ClInclude Include="BandStructure.h" />
+    <ClInclude Include="ChemUtils.h" />
     <ClInclude Include="Hamiltonian.h" />
     <ClInclude Include="Numerov.h" />
     <ClInclude Include="Options.h" />
     <ClInclude Include="OptionsFrame.h" />
+    <ClInclude Include="Pseudopotential.h" />
     <ClInclude Include="SpecialFunctions.h" />
     <ClInclude Include="SymmetryPoints.h" />
     <ClInclude Include="Vector3D.h" />
