@@ -45,6 +45,9 @@
     <ClCompile Include="Pseudopotential.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="BandStructureBasis.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="SymmetryPoints.h">
@@ -87,6 +90,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Pseudopotential.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="BandStructureBasis.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

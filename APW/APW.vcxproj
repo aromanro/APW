@@ -173,6 +173,7 @@
     <ClCompile Include="APWFrame.cpp" />
     <ClCompile Include="APWThread.cpp" />
     <ClCompile Include="BandStructure.cpp" />
+    <ClCompile Include="BandStructureBasis.cpp" />
     <ClCompile Include="ChemUtils.cpp" />
     <ClCompile Include="Options.cpp" />
     <ClCompile Include="OptionsFrame.cpp" />
@@ -185,6 +186,7 @@
     <ClInclude Include="APWFrame.h" />
     <ClInclude Include="APWThread.h" />
     <ClInclude Include="BandStructure.h" />
+    <ClInclude Include="BandStructureBasis.h" />
     <ClInclude Include="ChemUtils.h" />
     <ClInclude Include="Hamiltonian.h" />
     <ClInclude Include="Numerov.h" />
