@@ -17,7 +17,7 @@ namespace APW
 
 
 
-	std::vector<Vector3D<double>> SymmetryPoints::GeneratePoints(const std::vector<std::string>& path, int nrPoints, std::vector<unsigned int>& symmetryPointsPositions)
+	std::vector<Vector3D<double>> SymmetryPoints::GeneratePoints(const std::vector<std::string>& path, unsigned int nrPoints, std::vector<unsigned int>& symmetryPointsPositions)
 	{
 		std::vector<Vector3D<double>> result;
 
@@ -30,7 +30,7 @@ namespace APW
 
 		double length = 0;
 
-		for (int i = 1; i < path.size(); ++i)
+		for (unsigned int i = 1; i < path.size(); ++i)
 		{
 			const Vector3D<double> dif = symmetryPoints[path[i]].position - symmetryPoints[path[i - 1LL]].position;
 			length += dif.Length();
@@ -38,7 +38,7 @@ namespace APW
 
 		const double stepSize = length / (nrPoints - 1LL);
 
-		for (int i = 1; i < path.size(); ++i)
+		for (unsigned int i = 1; i < path.size(); ++i)
 		{
 			const Vector3D<double> startPos = symmetryPoints[path[i - 1LL]].position;
 			const Vector3D<double> dif = symmetryPoints[path[i]].position - startPos;
