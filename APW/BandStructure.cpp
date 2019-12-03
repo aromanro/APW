@@ -40,11 +40,11 @@ namespace APW
 		// it's not as good as the Cu pseudopotential for APW, the match with https://www.materialscloud.org/discover/sssp/plot/efficiency/Al is worse
 		// than that of Cu https://www.materialscloud.org/discover/sssp/plot/efficiency/Cu
 		
-		//APW::Pseudopotential pseudopotential;
+		//Pseudopotential pseudopotential;
 		//const bool success = pseudopotential.Load(Chemistry::ChemUtils::GetPseudopotentialFileForZ(13));
 		//assert(success && pseudopotential.GetZ() == 13);
 
-		APW::Potential potential;
+		Potential potential;
 		potential.m_potentialValues.resize(numerovGridNodes);
 		for (int i = 0; i < numerovGridNodes; ++i)
 		{
@@ -71,8 +71,8 @@ namespace APW
 
 			tasks[t] = std::async(launchType, [this, &potential, numerovGridNodes, &ratios, startPos, nextPos, minE, dE, lMax, numerovIntervals, deltaGrid, &terminate]()->void
 				{
-					//APW::Numerov<APW::NumerovFunctionRegularGrid> numerov(potential, 0, m_Rmax, numerovGridNodes);
-					APW::Numerov<APW::NumerovFunctionNonUniformGrid> numerov(potential, deltaGrid, m_Rmax, numerovGridNodes);
+					//Numerov<NumerovFunctionRegularGrid> numerov(potential, 0, m_Rmax, numerovGridNodes);
+					Numerov<NumerovFunctionNonUniformGrid> numerov(potential, deltaGrid, m_Rmax, numerovGridNodes);
 
 					for (int posE = startPos; posE < nextPos && !terminate; ++posE)
 					{
@@ -105,7 +105,7 @@ namespace APW
 
 			tasks[t] = std::async(launchType, [this, startPos, nextPos, numIntervals, minE, dE, lMax, &ratios, &res, &terminate]()->void
 				{
-					APW::Hamiltonian hamiltonian(basisVectors, m_Rmax, m_a, m_a * m_a * m_a / 4., lMax);
+					Hamiltonian hamiltonian(basisVectors, m_Rmax, m_a, m_a * m_a * m_a / 4., lMax);
 
 					// now, loop over k points
 					for (int k = startPos; k < nextPos && !terminate; ++k)
