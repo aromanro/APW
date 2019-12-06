@@ -35,9 +35,6 @@ protected:
 
 	std::vector<Vector3D<double>> kpoints;
 
-	unsigned int nearestNeighbors;
-	std::vector<unsigned int> G2;
-
 	double m_a;
 	double m_Rmax;
 

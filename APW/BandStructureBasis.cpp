@@ -7,9 +7,7 @@ namespace APW
 {
 
 	BandStructureBasis::BandStructureBasis(double a, double rmax)
-		: nearestNeighbors(9),
-		G2{ 0, 3, 4, 8, 11, 12, 16, 19, 20, 24 },
-		m_a(a), m_Rmax(rmax)
+		: m_a(a), m_Rmax(rmax)
 	{
 		// if the passed value was zero or negative, make them touching spheres
 		if (m_Rmax <= 0)
@@ -23,7 +21,8 @@ namespace APW
 	{
 		if (nearestNeighborsNumber < 2 || nearestNeighborsNumber > 10) return false;
 
-		nearestNeighbors = nearestNeighborsNumber - 1;
+		static const std::vector<unsigned int> G2{ 0, 3, 4, 8, 11, 12, 16, 19, 20, 24 };
+		const unsigned int nearestNeighbors = nearestNeighborsNumber - 1;
 		basisVectors.clear();
 
 		const int size = static_cast<int>(ceil(sqrt(static_cast<double>(G2[nearestNeighbors]))));
