@@ -244,8 +244,9 @@ namespace APW {
 			}
 			
 			const double realSolution = function.GetWavefunctionValue(steps, solution);
+			const double prevSolution = function.GetWavefunctionValue(steps - 1ULL, oldSolution);
 
-			return (realSolution - function.GetWavefunctionValue(steps - 1ULL, oldSolution)) / function.GetDerivativeStep(steps, h) / realSolution;
+			return (realSolution - prevSolution) / (function.GetDerivativeStep(steps, h) * realSolution);
 		}
 
 		NumerovFunction function;
