@@ -59,7 +59,7 @@ namespace APW
 		std::launch launchType = options.nrThreads == 1 ? std::launch::deferred : std::launch::async;
 
 		int startPos = 0;
-		int step = numIntervals / options.nrThreads;
+		int step = static_cast<int>(ceil(static_cast<double>(numIntervals) / options.nrThreads));
 		if (step < 1) step = 1; 
 		int nextPos;
 
@@ -95,7 +95,7 @@ namespace APW
 		res.resize(kpoints.size());
 	
 		startPos = 0;
-		step = kpoints.size() / options.nrThreads;
+		step = static_cast<int>(ceil(static_cast<double>(kpoints.size()) / options.nrThreads));
 		if (step < 1) step = 1;
 
 		for (int t = 0; t < options.nrThreads; ++t, startPos = nextPos)
