@@ -103,6 +103,8 @@ namespace APW
 			if (t == options.nrThreads - 1) nextPos = kpoints.size();
 			else nextPos = startPos + step;
 
+			if (nextPos > kpoints.size()) nextPos = kpoints.size();
+
 			tasks[t] = std::async(launchType, [this, startPos, nextPos, numIntervals, minE, dE, lMax, &ratios, &res, &terminate]()->void
 				{
 					Hamiltonian hamiltonian(basisVectors, m_Rmax, m_a, m_a * m_a * m_a / 4., lMax);
