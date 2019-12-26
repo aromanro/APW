@@ -125,7 +125,7 @@ namespace APW
 							bool blowup = false;
 							for (int l = 0; l <= lMax && !terminate; ++l)
 							{
-								if (abs(ratios[posE][l]) > 300 || isnan(ratios[posE][l]) || isinf(ratios[posE][l]))
+								if (isnan(ratios[posE][l]) || isinf(ratios[posE][l]) || abs(ratios[posE][l]) > 300)
 								{
 									blowup = true;
 									break;
