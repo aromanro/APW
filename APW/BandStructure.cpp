@@ -147,7 +147,10 @@ namespace APW
 								// linear interpolation
 								const double val = E - dE * det / (det - oldDet);
 
-								res[k].push_back(val);
+								if (!isnan(val) && !isinf(val) && val >= E - dE && val <= E)
+									res[k].push_back(val);
+								else
+									res[k].push_back(E - 0.5 * dE);
 							}
 							else if (posE > 1 && abs(oldDet) < abs(olderDet) && abs(oldDet) < abs(det) && abs(oldDet) < 1E-15 && // went over a small minimum
 								((olderDet < 0 && oldDet < 0 && det < 0) || (olderDet > 0 && oldDet > 0 && det > 0))) // all have the same sign, otherwise the sign change should be detected
@@ -171,7 +174,10 @@ namespace APW
 								//const double val = E - dE;
 								const double val = E - 0.5 * dE * (coef1 + 2 * coef2 + 3 * coef3) / (coef1 + coef2 + coef3);
 
-								res[k].push_back(val);
+								if (!isnan(val) && !isinf(val) && val >= E - 2 * dE && val <= E)
+									res[k].push_back(val);
+								else
+									res[k].push_back(val - dE);
 							}
 
 							olderDet = oldDet;
