@@ -91,6 +91,7 @@ private:
 	void Compute();
 
 	void OnExit(wxCommandEvent& event);
+	void OnClose(wxCloseEvent& event);
 	void OnOptions(wxCommandEvent& event);
 	void OnAbout(wxCommandEvent& event);
 	void OnTimer(wxTimerEvent& event);

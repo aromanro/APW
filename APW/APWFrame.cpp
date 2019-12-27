@@ -22,6 +22,7 @@ wxBEGIN_EVENT_TABLE(APWFrame, wxFrame)
 EVT_MENU(ID_CALCULATE, APWFrame::OnCalculate)
 EVT_UPDATE_UI(ID_CALCULATE, APWFrame::OnUpdateCalculate)
 EVT_MENU(wxID_EXIT, APWFrame::OnExit)
+EVT_CLOSE(APWFrame::OnClose)
 EVT_MENU(wxID_PREFERENCES, APWFrame::OnOptions)
 EVT_MENU(wxID_ABOUT, APWFrame::OnAbout)
 EVT_TIMER(101, APWFrame::OnTimer)
@@ -271,6 +272,14 @@ void APWFrame::OnEraseBackground(wxEraseEvent& event)
 
 
 void APWFrame::OnExit(wxCommandEvent& /*event*/)
+{
+	StopThreads(true);
+
+	Close(true);
+}
+
+
+void APWFrame::OnClose(wxCloseEvent& event)
 {
 	StopThreads(true);
 
