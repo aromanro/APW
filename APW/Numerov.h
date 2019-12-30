@@ -60,6 +60,12 @@ namespace APW {
 		{
 			return value;
 		}
+
+		inline double GetSrcAdjustedValue(size_t posIndex, double value) const
+		{
+			return value;
+		}
+
 	protected:
 
 		const Potential& m_pot;
@@ -165,6 +171,12 @@ namespace APW {
 			return exp(posIndex * m_delta * 0.5) * value;
 		}
 
+		inline double GetSrcAdjustedValue(size_t posIndex, double value) const
+		{
+			return exp(-0.5 * posIndex * m_delta) * value;
+		}
+
+
 		inline double GetRp() const { return Rp; }
 		inline double GetDelta() const { return m_delta; }
 	protected:
@@ -249,6 +261,141 @@ namespace APW {
 			return (realSolution - prevSolution) / (function.GetDerivativeStep(steps, h) * realSolution);
 		}
 
+
+		// should be needed in case of wanting to implement LAPW
+
+		inline std::vector<double> SolveSchrodingerFull(double endPoint, unsigned int l, double E, long int steps)
+		{
+			const long int highLimit = steps + 1;
+			std::vector<double> Psi(highLimit);
+
+			if (endPoint == steps)
+			{
+				h = 1;
+				h2 = 1;
+				h2p12 = 1. / 12.;
+
+				endPoint = std::min(endPoint, function.GetMaxRadiusIndex(E, steps, 1));
+				steps = static_cast<long int>(endPoint);
+			}
+			else
+			{
+				h = endPoint / steps;
+				h2 = h * h;
+				h2p12 = h2 / 12.;
+
+				endPoint = std::min(endPoint, function.GetMaxRadius(E, steps));
+				steps = static_cast<long int>(endPoint / h);
+			}
+
+			double position = 0;
+			double prevSol = 0;
+			double solution = 0;
+			double wprev = 0;
+
+			Psi[0] = function.GetWavefunctionValue(0, solution);
+
+			position += h;
+			solution = function.GetBoundaryValueZero(position, l);
+
+			Psi[1] = function.GetWavefunctionValue(1, solution);
+
+			double funcVal = function(l, E, position, 1);
+			double w = (1 - h2p12 * funcVal) * solution;
+
+			for (long int i = 2; i <= steps; ++i)
+			{
+				const double wnext = 2. * w - wprev + h2 * solution * funcVal;
+
+				position = h * i;
+
+				wprev = w;
+				w = wnext;
+
+				funcVal = function(l, E, position, i);
+
+				solution = getU(w, funcVal);
+
+				Psi[i] = function.GetWavefunctionValue(i, solution); // already adjusted for the case of the non uniform grid
+			}
+
+			return Psi;
+		}
+
+
+		// it's not actually the 'general' solution (for example assumes solution and src 0 at r = 0), but it adds a 'source' term
+		// if 'function' would return zero, this would solve the Poisson equation with the source 'src', whence the name
+		// it should be actually used to obtain the energy derivative of the wavefunction, needed in LAPW (see eq 6.46 in the Computational Physics book)
+		// so the 'source' would be actually the wavefunction (but this, as above, deals with u, not with R; R = u / r)
+		// to be noted that src should be multiplied by 2 because the kinetic term in Schrodinger has 1/2 in it
+		// for the same reason the operator() for the 'function' has a multiplication with 2
+
+		//WARNING: It's not tested yet, there is a good change I made a mistake at some sign or something like that
+
+		inline std::vector<double> SolveGeneral(const std::vector<double>& src, double endPoint, unsigned int l, double E, long int steps)
+		{
+			const long int highLimit = steps + 1;
+			std::vector<double> Psi(highLimit);
+
+			if (endPoint == steps)
+			{
+				h = 1;
+				h2 = 1;
+				h2p12 = 1. / 12.;
+
+				endPoint = std::min(endPoint, function.GetMaxRadiusIndex(E, steps, 1));
+				steps = static_cast<long int>(endPoint);
+			}
+			else
+			{
+				h = endPoint / steps;
+				h2 = h * h;
+				h2p12 = h2 / 12.;
+
+				endPoint = std::min(endPoint, function.GetMaxRadius(E, steps));
+				steps = static_cast<long int>(endPoint / h);
+			}
+
+			double position = 0;
+			double prevSol = 0;
+			double solution = 0;
+			double srcVal = function.GetSrcAdjustedValue(2. * src[0]);
+			double wprev = h2p12 * srcVal;
+
+			Psi[0] = function.GetWavefunctionValue(0, solution);
+
+			position += h;
+			solution = function.GetBoundaryValueZero(position, l);
+
+			Psi[1] = function.GetWavefunctionValue(1, solution);
+
+			double funcVal = function(l, E, position, 1);
+			srcVal = function.GetSrcAdjustedValue(2. * src[1]);
+
+			double w = (1 - h2p12 * funcVal) * solution + h2p12 * srcVal;
+
+			for (long int i = 2; i <= steps; ++i)
+			{
+				const double wnext = 2. * w - wprev + h2 * (solution * funcVal - srcVal);
+
+				position = h * i;
+
+				wprev = w;
+				w = wnext;
+
+				funcVal = function(l, E, position, i);
+				srcVal = function.GetSrcAdjustedValue(2. * src[i]);
+
+				solution = getU(w, funcVal, srcVal);
+
+				Psi[i] = function.GetWavefunctionValue(i, solution); // already adjusted for the case of the non uniform grid
+			}
+
+			return Psi;
+		}
+
+
+
 		NumerovFunction function;
 
 	protected:
@@ -256,6 +403,11 @@ namespace APW {
 		inline double getU(double w, double funcVal) const
 		{
 			return w / (1. - h2p12 * funcVal);
+		}
+
+		inline double getU(double w, double funcVal, double srcVal) const
+		{
+			return (w - h2p12 * srcVal) / (1. - h2p12 * funcVal);
 		}
 
 		double h;
