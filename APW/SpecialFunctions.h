@@ -94,6 +94,18 @@ namespace SpecialFunctions
 #endif
 		}
 
+		static double jderiv(unsigned int l, const double x)
+		{
+			return static_cast<double>(l) / x * j(l, x) - j(l + 1, x);
+			//return (j(l, x) - j(l, x - .0001)) / 0.0001;
+		}
+
+		static double nderiv(unsigned int l, const double x)
+		{
+			return static_cast<double>(l) / x * n(l, x) - n(l + 1, x);
+			//return (n(l, x) - n(l, x - .0001)) / 0.0001;
+		}
+
 		/*
 		protected:
 			inline static double j0(double x) { return sin(x) / x; }

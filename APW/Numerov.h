@@ -359,7 +359,7 @@ namespace APW {
 			double position = 0;
 			double prevSol = 0;
 			double solution = 0;
-			double srcVal = function.GetSrcAdjustedValue(2. * src[0]);
+			double srcVal = function.GetSrcAdjustedValue(0, 2. * src[0]);
 			double wprev = h2p12 * srcVal;
 
 			Psi[0] = function.GetWavefunctionValue(0, solution);
@@ -370,7 +370,7 @@ namespace APW {
 			Psi[1] = function.GetWavefunctionValue(1, solution);
 
 			double funcVal = function(l, E, position, 1);
-			srcVal = function.GetSrcAdjustedValue(2. * src[1]);
+			srcVal = function.GetSrcAdjustedValue(1, 2. * src[1]);
 
 			double w = (1 - h2p12 * funcVal) * solution + h2p12 * srcVal;
 
@@ -384,7 +384,7 @@ namespace APW {
 				w = wnext;
 
 				funcVal = function(l, E, position, i);
-				srcVal = function.GetSrcAdjustedValue(2. * src[i]);
+				srcVal = function.GetSrcAdjustedValue(i, 2. * src[i]);
 
 				solution = getU(w, funcVal, srcVal);
 

@@ -34,6 +34,10 @@ namespace LAPW
 			results.reserve(nrPoints);
 		};
 
+
+		static void NormalizeNonUniform(std::vector<double>& Psi, double Rp, double deltaGrid);
+		static void NormalizeUniform(std::vector<double>& Psi, double h);
+
 		std::vector<std::vector<double>> Compute(const std::atomic_bool& terminate, const Options& options);
 	};
 

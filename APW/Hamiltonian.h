@@ -23,7 +23,7 @@ namespace APW
 		: m_basisVectors(basisVectors), m_R(R), prefactor(2. * M_PI * R / cellVolume), m_lMax(lmax)
 		{		
 			// compute A
-			size_t size = basisVectors.size();
+			const size_t size = basisVectors.size();
 			A.resize(size, size);			
 			const double mtwopref = -2. * prefactor * R; // -4 * M_PI * R^2 / cellVolume
 
@@ -50,7 +50,7 @@ namespace APW
 
 		void ComputeBC(const Vector3D<double>& k)
 		{
-			size_t size = m_basisVectors.size();
+			const size_t size = m_basisVectors.size();
 
 			for (size_t i = 0; i < size; ++i)
 			{
