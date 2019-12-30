@@ -283,7 +283,7 @@ void APWFrame::OnClose(wxCloseEvent& event)
 {
 	StopThreads(true);
 
-	Close(true);
+	event.Skip();
 }
 
 void APWFrame::OnAbout(wxCommandEvent& /*event*/)

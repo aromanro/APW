@@ -36,7 +36,7 @@ namespace LAPW
 		for (int i = 0; i < result2.size(); ++i)
 		{
 			// if nonuniform, convert the function back!!!!!
-			Psi[i] *= exp(i * deltaGrid * 0.5);
+			//Psi[i] *= exp(i * deltaGrid * 0.5); // it's already converted in numerov
 
 			result2[i] = Psi[i] * Psi[i];
 
@@ -52,13 +52,9 @@ namespace LAPW
 			Psi[i] /= norm;
 	}
 
-	// This is empty for now, I'll leave it here just in case I want to add LAPW implementation
 
 	std::vector<std::vector<double>> BandStructure::Compute(const std::atomic_bool& terminate, const Options& options)
 	{
-		const double minE = -0.2;
-		const double maxE = 0.8;
-
 		const int numerovIntervals = 2000;
 		const int numerovGridNodes = numerovIntervals + 1;
 		const double dr = m_Rmax / numerovIntervals;
@@ -90,6 +86,7 @@ namespace LAPW
 		vals[5].El = 0.5;
 
 		// TODO: must check this, probably has mistakes
+		// tried it, it does not work, something is still not ok
 
 		const double R2 = m_Rmax * m_Rmax;
 
@@ -139,10 +136,47 @@ namespace LAPW
 		}
 
 
-		// TODO: now solve the generalized eigenvalue problem for each k
+		// now solve the generalized eigenvalue problem for each k
 
-		
-		return res;
+		std::vector<std::future<void>> tasks(options.nrThreads);
+		std::launch launchType = options.nrThreads == 1 ? std::launch::deferred : std::launch::async;
+
+
+		res.resize(kpoints.size());
+
+		int startPos = 0;
+		int step = static_cast<int>(ceil(static_cast<double>(kpoints.size()) / options.nrThreads));
+		if (step < 1) step = 1;
+		int nextPos;
+
+		for (int t = 0; t < options.nrThreads; ++t, startPos = nextPos)
+		{
+			if (t == options.nrThreads - 1) nextPos = kpoints.size();
+			else nextPos = startPos + step;
+
+			if (nextPos > kpoints.size()) nextPos = kpoints.size();
+
+			tasks[t] = std::async(launchType, [this, startPos, nextPos, lMax, &vals, &res, &terminate]()->void
+				{
+					Hamiltonian hamiltonian(basisVectors, m_Rmax, m_a, m_a * m_a * m_a / 4.);
+
+					// now, loop over k points
+					for (int k = startPos; k < nextPos && !terminate; ++k)
+					{
+						hamiltonian.Compute(k, vals);
+						const Eigen::VectorXd v = hamiltonian.GetEnergies();
+						for (int i = 0; i < v.rows(); ++i)
+							res[k].push_back(v(i));
+
+					}
+				}
+			);
+		}
+
+		for (auto& task : tasks)
+			task.get();
+
+		return std::move(res);
 	}
 
 }

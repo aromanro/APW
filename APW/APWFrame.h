@@ -51,12 +51,13 @@
 #include "SpecialFunctions.h"
 #include "APWThread.h"
 
+#include "LAPWBandStructure.h"
+
 class APWFrame : public wxFrame
 {
 public:
 	APWFrame(const wxString& title, const wxPoint& pos, const wxSize& size);
 	~APWFrame();
-
 
 	std::atomic_int runningThreads;
 
