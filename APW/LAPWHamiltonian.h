@@ -32,12 +32,14 @@ namespace LAPW
 		{
 			const double q1_length = q1.Length();
 			const double q2_length = q2.Length();
+			const double q1_lengthR = q1_length * R;
+			const double q2_lengthR = q2_length * R;
 
-			const double jlp1 = SpecialFunctions::Bessel::jderiv(l, q1_length * R) * q1_length;
-			const double jl1 = SpecialFunctions::Bessel::j(l, q1_length * R);
+			const double jlp1 = SpecialFunctions::Bessel::jderiv(l, q1_lengthR) * q1_length;
+			const double jl1 = SpecialFunctions::Bessel::j(l, q1_lengthR);
 			
-			const double jlp2 = SpecialFunctions::Bessel::jderiv(l, q2_length * R) * q2_length;
-			const double jl2 = SpecialFunctions::Bessel::j(l, q2_length * R);
+			const double jlp2 = SpecialFunctions::Bessel::jderiv(l, q2_lengthR) * q2_length;
+			const double jl2 = SpecialFunctions::Bessel::j(l, q2_lengthR);
 
 			// 6.42b
 			const double al1 = jlp1 * EnergyDerivative - jl1 * BothDerivative;
@@ -91,6 +93,7 @@ namespace LAPW
 		{
 			const size_t m_lMax = vals.size();
 			const size_t size = m_basisVectors.size();
+			const double prefactor2 = prefactor * m_R * m_R;
 
 			for (size_t i = 0; i < size; ++i)
 			{
@@ -123,7 +126,7 @@ namespace LAPW
 						H(i, j) += p * (vals[l].El * sl + gammal);
 					}
 					
-					S(i, j) = U(i, j) + prefactor * m_R * m_R * S(i, j); 
+					S(i, j) = U(i, j) + prefactor2 * S(i, j); 
 					H(i, j) = qiqj * U(i, j) + prefactor * H(i, j);
 
 					if (i != j)

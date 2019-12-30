@@ -102,10 +102,15 @@ namespace LAPW
 			NormalizeNonUniform(u, Rp, deltaGrid);
 
 			const size_t lastPos = u.size() - 1;
+
 			vals[l].Wavefunction = u[lastPos] / m_Rmax; // Rl = u / r
 
+
+
+			const double derivStep = numerov.function.GetDerivativeStep(numerovIntervals, 1);
+
 			// compute its radial derivative
-			const double up = (u[lastPos] - u[lastPos - 1]) / numerov.function.GetDerivativeStep(numerovIntervals, 1);
+			const double up = (u[lastPos] - u[lastPos - 1]) / derivStep;
 			vals[l].RadialDerivative = up / m_Rmax - u[lastPos] / R2;
 
 			// compute the energy derivative of the wavefunction
@@ -125,7 +130,7 @@ namespace LAPW
 			vals[l].EnergyDerivative = udot[lastPos] / m_Rmax;
 			
 			// now derivative of both
-			const double udotp = (udot[lastPos] - udot[lastPos - 1]) / numerov.function.GetDerivativeStep(numerovIntervals, 1);
+			const double udotp = (udot[lastPos] - udot[lastPos - 1]) / derivStep;
 			vals[l].BothDerivative = udotp / m_Rmax - udot[lastPos] / R2;
 
 			// 6.49
