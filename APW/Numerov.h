@@ -235,7 +235,7 @@ namespace APW {
 			position += h;
 			solution = function.GetBoundaryValueZero(position, l);
 			double funcVal = function(l, E, position, 1);
-			double w = (1 - h2p12 * funcVal) * solution;
+			double w = (1. - h2p12 * funcVal) * solution;
 
 			for (long int i = 2; i <= steps; ++i)
 			{
@@ -301,7 +301,7 @@ namespace APW {
 			Psi[1] = function.GetWavefunctionValue(1, solution);
 
 			double funcVal = function(l, E, position, 1);
-			double w = (1 - h2p12 * funcVal) * solution;
+			double w = (1. - h2p12 * funcVal) * solution;
 
 			for (long int i = 2; i <= steps; ++i)
 			{
@@ -331,6 +331,7 @@ namespace APW {
 		// for the same reason the operator() for the 'function' has a multiplication with 2
 
 		//WARNING: It's not tested yet, there is a good change I made a mistake at some sign or something like that
+		// almost sure it's wrong for non uniform, must check this, so first make it work with uniform!
 
 		inline std::vector<double> SolveGeneral(const std::vector<double>& src, double endPoint, unsigned int l, double E, long int steps)
 		{
@@ -372,7 +373,7 @@ namespace APW {
 			double funcVal = function(l, E, position, 1);
 			srcVal = function.GetSrcAdjustedValue(1, 2. * src[1]);
 
-			double w = (1 - h2p12 * funcVal) * solution + h2p12 * srcVal;
+			double w = (1. - h2p12 * funcVal) * solution + h2p12 * srcVal;
 
 			for (long int i = 2; i <= steps; ++i)
 			{
@@ -393,8 +394,6 @@ namespace APW {
 
 			return Psi;
 		}
-
-
 
 		NumerovFunction function;
 

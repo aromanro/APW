@@ -80,7 +80,7 @@ namespace LAPW
 					U(j, i) = U(i, j) = mtwopref * SpecialFunctions::Bessel::j(1, dist * R) / dist;
 				}
 
-				U(i, i) = mtwopref * R / 3. + 1; // 1 is from delta
+				U(i, i) = mtwopref * R / 3. + 1.; // 1 is from delta
 			}
 
 
@@ -93,7 +93,7 @@ namespace LAPW
 		{
 			const size_t m_lMax = vals.size();
 			const size_t size = m_basisVectors.size();
-			const double prefactor2 = prefactor * m_R * m_R;
+			const double prefactor2 = prefactor * m_R * m_R; // 4. * M_PI * R^4 / cellVolume
 
 			for (size_t i = 0; i < size; ++i)
 			{
@@ -117,17 +117,18 @@ namespace LAPW
 					
 					for (unsigned int l = 0; l < m_lMax; ++l)
 					{
-						const double p = (2. * l + 1.) * SpecialFunctions::Legendre::p(l, cosTheta);
+						const double twolp1 = 2. * l + 1.;
+						const double p = SpecialFunctions::Legendre::p(l, cosTheta);
 						double sl;
 						double gammal;
 						std::tie(sl, gammal) = vals[l].ComputeSlGammal(l, m_R, qi, qj);
 						
-						S(i, j) += p * sl;
-						H(i, j) += p * (vals[l].El * sl + gammal);
+						S(i, j) += twolp1 * p * sl;
+						H(i, j) += twolp1 * SpecialFunctions::Legendre::p(l, vals[l].El * sl + gammal);
 					}
 					
 					S(i, j) = U(i, j) + prefactor2 * S(i, j); 
-					H(i, j) = qiqj * U(i, j) + prefactor * H(i, j);
+					H(i, j) = qiqj * U(i, j) + prefactor2 * H(i, j);
 
 					if (i != j)
 					{

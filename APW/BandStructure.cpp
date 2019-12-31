@@ -21,7 +21,7 @@ namespace APW
 
 		const int numerovGridNodes = numerovIntervals + 1;
 
-		const double dr = m_Rmax / numerovIntervals;
+		//const double dr = m_Rmax / numerovIntervals;
 
 		const size_t lMax = 5;
 
