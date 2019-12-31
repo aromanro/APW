@@ -99,22 +99,25 @@ namespace LAPW
 			// compute wavefunction
 			APW::Numerov<APW::NumerovFunctionRegularGrid> numerov(potential, 0, m_Rmax, numerovGridNodes);
 			//APW::Numerov<APW::NumerovFunctionNonUniformGrid> numerov(potential, deltaGrid, m_Rmax, numerovGridNodes);
+
 			std::vector<double> u = numerov.SolveSchrodingerFull(m_Rmax/*numerovIntervals*/, l, El, numerovIntervals);
 
 			// normalize it
 			//NormalizeNonUniform(u, Rp, deltaGrid);
+
+
 			NormalizeUniform(u, dr);
 
 			const size_t lastPos = u.size() - 1;
 
-			vals[l].Wavefunction = u[lastPos]; // / m_Rmax; // Rl = u / r
+			vals[l].Wavefunction = u[lastPos] / m_Rmax; // Rl = u / r
 
 
 			const double derivStep = numerov.function.GetDerivativeStep(numerovIntervals, 1);
 
 			// compute its radial derivative
 			const double up = (u[lastPos] - u[lastPos - 1]) / derivStep;
-			vals[l].RadialDerivative = up; // / m_Rmax - u[lastPos] / R2;
+			vals[l].RadialDerivative = up / m_Rmax - u[lastPos] / R2;
 
 			// compute the energy derivative of the wavefunction
 			std::vector<double> udot = numerov.SolveGeneral(u, m_Rmax/*numerovIntervals*/, l, El, numerovIntervals);
@@ -131,15 +134,15 @@ namespace LAPW
 			for (int i = 0; i < udot.size(); ++i)
 				udot[i] += alpha * u[i];
 
-			vals[l].EnergyDerivative = udot[lastPos]; // / m_Rmax;
+			vals[l].EnergyDerivative = udot[lastPos] / m_Rmax;
 			
 			// now derivative of both
 			const double udotp = (udot[lastPos] - udot[lastPos - 1]) / derivStep;
-			vals[l].BothDerivative = udotp; // / m_Rmax - udot[lastPos] / R2;
+			vals[l].BothDerivative = udotp / m_Rmax - udot[lastPos] / R2;
 
 			// 6.49
 			for (int i = 0; i < udot.size(); ++i)
-				udot[i] *= udot[i] * R2;
+				udot[i] *= udot[i];
 				
 			vals[l].Nl = Integral::Boole(1, udot);
 		}
