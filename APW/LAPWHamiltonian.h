@@ -124,7 +124,10 @@ namespace LAPW
 						std::tie(sl, gammal) = vals[l].ComputeSlGammal(l, m_R, qi, qj);
 						
 						S(i, j) += twolp1 * p * sl;
-						H(i, j) += twolp1 * SpecialFunctions::Legendre::p(l, vals[l].El * sl + gammal);
+
+						const double v = vals[l].El * sl + gammal;
+
+						H(i, j) += twolp1 * SpecialFunctions::Legendre::p(l, v);
 					}
 					
 					S(i, j) = U(i, j) + prefactor2 * S(i, j); 
