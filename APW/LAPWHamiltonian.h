@@ -15,7 +15,6 @@
 
 namespace LAPW
 {
-	// Still have to compute them
 	// there will be one for each l up to max l
 	class Values
 	{
@@ -64,7 +63,7 @@ namespace LAPW
 	{
 	public:
 		Hamiltonian(const std::vector<Vector3D<double>>& basisVectors, double R, double a, double cellVolume)
-			: m_basisVectors(basisVectors), m_R(R), prefactor(4. * M_PI * R * R / cellVolume)
+			: m_basisVectors(basisVectors), m_R(R), prefactor(4. * M_PI * R * R / cellVolume), prefactor2(4. * M_PI / (cellVolume * R * R * R * R))
 		{
 			// compute U, it's the same as A in APW
 			size_t size = basisVectors.size();
@@ -88,12 +87,11 @@ namespace LAPW
 			H.resize(size, size);
 		}
 
-
+		// TODO: looks like I'll have to derive it myself, with the formulae from the book I don't get correct values :(
 		void Compute(const Vector3D<double>& k, const std::vector<Values>& vals)
 		{
 			const size_t m_lMax = vals.size();
 			const size_t size = m_basisVectors.size();
-			const double prefactor2 = prefactor * m_R * m_R; // 4. * M_PI * R^4 / cellVolume
 
 			for (size_t i = 0; i < size; ++i)
 			{
@@ -102,9 +100,11 @@ namespace LAPW
 					const Vector3D<double> qi = m_basisVectors[i] + k;
 					const Vector3D<double> qj = m_basisVectors[j] + k;
 					const double qiqjscalar = qi * qj;
+					const double qi2 = qi * qi;
+					const double qj2 = qj * qj;
 
-					const double qilength = qi.Length();
-					const double qjlength = qj.Length();
+					const double qilength = sqrt(qi2);
+					const double qjlength = sqrt(qj2);
 
 					const double qiqj = qilength * qjlength;
 					double cosTheta = qiqjscalar / qiqj;
@@ -122,16 +122,19 @@ namespace LAPW
 						double sl;
 						double gammal;
 						std::tie(sl, gammal) = vals[l].ComputeSlGammal(l, m_R, qi, qj);
+
+						const double psl = p * sl;
 						
-						S(i, j) += twolp1 * p * sl;
+						S(i, j) += twolp1 * psl;
 
-						const double v = vals[l].El * sl + gammal;
+						// the energy is given in Hartrees, whence the 2.
+						const double v = 2. * vals[l].El * sl + gammal;
 
-						H(i, j) += twolp1 * SpecialFunctions::Legendre::p(l, v);
+						H(i, j) += twolp1 * p * v; // SpecialFunctions::Legendre::p(l, v);
 					}
 					
 					S(i, j) = U(i, j) + prefactor2 * S(i, j); 
-					H(i, j) = qiqj * U(i, j) + prefactor2 * H(i, j);
+					H(i, j) = qiqjscalar * U(i, j) + prefactor2 * H(i, j);
 
 					if (i != j)
 					{
@@ -155,6 +158,7 @@ namespace LAPW
 		const std::vector<Vector3D<double>>& m_basisVectors;
 		const double m_R;
 		const double prefactor;
+		const double prefactor2;
 
 		// see 6.43c for calculation details
 		Eigen::MatrixXd U;

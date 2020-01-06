@@ -17,14 +17,15 @@ namespace LAPW
 
 	void BandStructure::NormalizeUniform(std::vector<double>& Psi, double h)
 	{
-		std::vector<double> result2(Psi.size());
-		for (int i = 0; i < result2.size(); ++i)
+		const size_t size = Psi.size();
+		std::vector<double> result2(size);
+		for (int i = 0; i < size; ++i)
 			result2[i] = Psi[i] * Psi[i];
 
 		const double integralForSquare = Integral::Boole(h, result2);
 		const double norm = sqrt(integralForSquare);
 
-		for (int i = 0; i < Psi.size(); ++i)
+		for (int i = 0; i < size; ++i)
 			Psi[i] /= norm;
 	}
 
@@ -32,8 +33,9 @@ namespace LAPW
 
 	void BandStructure::NormalizeNonUniform(std::vector<double>& Psi, double Rp, double deltaGrid)
 	{
-		std::vector<double> result2(Psi.size());
-		for (int i = 0; i < result2.size(); ++i)
+		const size_t size = Psi.size();
+		std::vector<double> result2(size);
+		for (int i = 0; i < size; ++i)
 		{
 			// if nonuniform, convert the function back!!!!!
 			//Psi[i] *= exp(i * deltaGrid * 0.5); // it's already converted in numerov
@@ -48,14 +50,14 @@ namespace LAPW
 		const double integralForSquare = Integral::Boole(1, result2); // for nonuniform case the step is 1
 		const double norm = sqrt(integralForSquare);
 
-		for (int i = 0; i < Psi.size(); ++i)
+		for (int i = 0; i < size; ++i)
 			Psi[i] /= norm;
 	}
 
 
 	std::vector<std::vector<double>> BandStructure::Compute(const std::atomic_bool& terminate, const Options& options)
 	{
-		const int numerovIntervals = 2000;
+		const int numerovIntervals = 16000;
 		const int numerovGridNodes = numerovIntervals + 1;
 		const double dr = m_Rmax / numerovIntervals;
 
@@ -87,8 +89,6 @@ namespace LAPW
 
 		// TODO: must check this, probably has mistakes
 		// tried it, it does not work, something is still not ok
-
-		// I'm not yet sure which derivatives are used, the book seems wrong
 
 		const double R2 = m_Rmax * m_Rmax;
 
@@ -128,22 +128,30 @@ namespace LAPW
 			for (int i = 0; i < uudot.size(); ++i)
 				uudot[i] = u[i] * udot[i];
 
-			const double alpha = -Integral::Boole(1, uudot);
+			const double alpha = -Integral::Boole(dr, uudot);
 
 			for (int i = 0; i < udot.size(); ++i)
 				udot[i] += alpha * u[i];
 
-			vals[l].EnergyDerivative = udot[lastPos] / m_Rmax;
+			// the formulae were derived with Rydberg atomic units, but the program uses Hartrees, so convert the derivatives to use Rydbergs for formulae
+			// d/d 2E = 0.5 d/dE
+			// so the two multiplications with 0.5 that follow are for this reason
+
+			vals[l].EnergyDerivative = 0.5 * udot[lastPos] / m_Rmax;
 			
 			// now derivative of both
 			const double udotp = (udot[lastPos] - udot[lastPos - 1]) / derivStep;
-			vals[l].BothDerivative = udotp / m_Rmax - udot[lastPos] / R2;
+			vals[l].BothDerivative = 0.5 * (udotp / m_Rmax - udot[lastPos] / R2);
 
 			// 6.49
 			for (int i = 0; i < udot.size(); ++i)
 				udot[i] *= udot[i];
 				
-			vals[l].Nl = Integral::Boole(1, udot);
+			// multiplied by 0.25 for the same reason as the 0.5 above
+			vals[l].Nl = 0.25 * Integral::Boole(dr, udot);
+
+			// should be 1, see 6.50
+			//const double val = m_Rmax * m_Rmax * (vals[l].RadialDerivative * vals[l].EnergyDerivative - vals[l].Wavefunction * vals[l].BothDerivative); 		
 		}
 
 
@@ -177,7 +185,12 @@ namespace LAPW
 						hamiltonian.Compute(k, vals);
 						const Eigen::VectorXd v = hamiltonian.GetEnergies();
 						for (int i = 0; i < v.rows(); ++i)
-							res[k].push_back(v(i));
+						{
+							const double val = 0.5 * v(i); // the formulae were with Rydbergs, convert back to Hartrees
+							if (val > 0.8)
+								break;
+							res[k].push_back(val); 
+						}
 
 					}
 				}
