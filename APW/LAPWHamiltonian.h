@@ -34,11 +34,11 @@ namespace LAPW
 			const double q1_lengthR = q1_length * R;
 			const double q2_lengthR = q2_length * R;
 
-			const double jlp1 = SpecialFunctions::Bessel::jderiv(l, q1_lengthR) * q1_length;
 			const double jl1 = SpecialFunctions::Bessel::j(l, q1_lengthR);
+			const double jlp1 = SpecialFunctions::Bessel::jderiv(l, q1_lengthR) * q1_length;
 			
-			const double jlp2 = SpecialFunctions::Bessel::jderiv(l, q2_lengthR) * q2_length;
 			const double jl2 = SpecialFunctions::Bessel::j(l, q2_lengthR);
+			const double jlp2 = SpecialFunctions::Bessel::jderiv(l, q2_lengthR) * q2_length;
 
 			// 6.42b
 			const double al1 = jlp1 * EnergyDerivative - jl1 * BothDerivative;
@@ -63,7 +63,7 @@ namespace LAPW
 	{
 	public:
 		Hamiltonian(const std::vector<Vector3D<double>>& basisVectors, double R, double a, double cellVolume)
-			: m_basisVectors(basisVectors), m_R(R), prefactor(4. * M_PI * R * R / cellVolume), prefactor2(4. * M_PI / (cellVolume * R * R * R * R))
+			: m_basisVectors(basisVectors), m_R(R), prefactor(4. * M_PI * R * R / cellVolume), prefactor2(prefactor * R * R)
 		{
 			// compute U, it's the same as A in APW
 			size_t size = basisVectors.size();
@@ -128,9 +128,9 @@ namespace LAPW
 						S(i, j) += twolp1 * psl;
 
 						// the energy is given in Hartrees, whence the 2.
-						const double v = 2. * vals[l].El * sl + gammal;
+						const double v = vals[l].El * sl + gammal;
 
-						H(i, j) += twolp1 * p * v; // SpecialFunctions::Legendre::p(l, v);
+						H(i, j) += twolp1 * p * v;
 					}
 					
 					S(i, j) = U(i, j) + prefactor2 * S(i, j); 

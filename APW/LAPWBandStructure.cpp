@@ -61,7 +61,7 @@ namespace LAPW
 		const int numerovGridNodes = numerovIntervals + 1;
 		const double dr = m_Rmax / numerovIntervals;
 
-		const size_t lMax = 5;
+		const size_t lMax = 8;
 
 		// the following two are needed for the non-uniform grid computations
 		const double deltaGrid = 0.005;
@@ -82,10 +82,14 @@ namespace LAPW
 
 
 		std::vector<Values> vals(lMax + 1);
+		// for now fix them all at the same energy
 		vals[0].El = vals[1].El = vals[2].El = 0.2;
-		vals[3].El = 0.3;
-		vals[4].El = 0.4;
-		vals[5].El = 0.5;
+		vals[3].El = 0.2;
+		vals[4].El = 0.2;
+		vals[5].El = 0.2;
+		vals[6].El = 0.2;
+		vals[7].El = 0.2;
+		vals[8].El = 0.2;
 
 		// TODO: must check this, probably has mistakes
 		// tried it, it does not work, something is still not ok
@@ -107,7 +111,9 @@ namespace LAPW
 
 			NormalizeUniform(u, dr);
 
-			const size_t lastPos = u.size() - 1;
+
+			const size_t size = u.size();
+			const size_t lastPos = size - 1;
 
 			vals[l].Wavefunction = u[lastPos] / m_Rmax; // Rl = u / r
 
@@ -122,16 +128,25 @@ namespace LAPW
 			std::vector<double> udot = numerov.SolveGeneral(u, m_Rmax/*numerovIntervals*/, l, El, numerovIntervals);
 			// the equation is inhomogeneous, add a particular solution of the homogeneous eqn, alpha * u
 			// get alpha from 6.48 condition
+			// this way udot is orthogonalized with u
 
 			// fill it with u * udot
-			std::vector<double> uudot(udot.size());
-			for (int i = 0; i < uudot.size(); ++i)
+			std::vector<double> uudot(size);
+			for (int i = 0; i < size; ++i)
 				uudot[i] = u[i] * udot[i];
 
-			const double alpha = -Integral::Boole(dr, uudot);
+			const double alpha = Integral::Boole(dr, uudot);
+			for (int i = 0; i < size; ++i)
+				udot[i] -= alpha * u[i];
 
-			for (int i = 0; i < udot.size(); ++i)
-				udot[i] += alpha * u[i];
+			// check:
+			/*
+			std::vector<double> udotu(size);
+			for (int i = 0; i < size; ++i)
+				udotu[i] = udot[i] * u[i];
+
+			const double sum = Integral::Boole(dr, udotu); // should be very close to zero
+			*/
 
 			// the formulae were derived with Rydberg atomic units, but the program uses Hartrees, so convert the derivatives to use Rydbergs for formulae
 			// d/d 2E = 0.5 d/dE
@@ -144,13 +159,13 @@ namespace LAPW
 			vals[l].BothDerivative = 0.5 * (udotp / m_Rmax - udot[lastPos] / R2);
 
 			// 6.49
-			for (int i = 0; i < udot.size(); ++i)
+			for (int i = 0; i < size; ++i)
 				udot[i] *= udot[i];
 				
 			// multiplied by 0.25 for the same reason as the 0.5 above
 			vals[l].Nl = 0.25 * Integral::Boole(dr, udot);
 
-			// should be 1, see 6.50
+			// should be 1, see 6.50 - but if you choose to go further with relations derived for Hartree atomic units, should be 2 (this comes out of the 1/2 of the kinetic term of the Schrodinger eqn).
 			//const double val = m_Rmax * m_Rmax * (vals[l].RadialDerivative * vals[l].EnergyDerivative - vals[l].Wavefunction * vals[l].BothDerivative); 		
 		}
 
