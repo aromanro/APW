@@ -55,7 +55,6 @@ namespace APW
 					const Vector3D<double> vect = b1 * i + b2 * j + b3 * k; // reciprocal lattice vector
 
 					const double vectSquared = vect * vect;
-
 					if (vectSquared <= G2[nearestNeighbors]) // if it's under the cutoff length, add it
 						basisVectors.push_back(vect);
 				}

@@ -4,6 +4,9 @@
 
 #include <future>
 
+#include <iostream>
+#include <fstream>
+
 #include "LAPWBandStructure.h"
 #include "LAPWHamiltonian.h"
 #include "Numerov.h"
@@ -54,7 +57,6 @@ namespace LAPW
 			Psi[i] /= norm;
 	}
 
-
 	std::vector<std::vector<double>> BandStructure::Compute(const std::atomic_bool& terminate, const Options& options)
 	{
 		const int numerovIntervals = 16000;
@@ -64,8 +66,8 @@ namespace LAPW
 		const size_t lMax = 8;
 
 		// the following two are needed for the non-uniform grid computations
-		const double deltaGrid = 0.005;
-		const double Rp = m_Rmax / (exp(numerovIntervals * deltaGrid) - 1.);
+		//const double deltaGrid = 0.005;
+		//const double Rp = m_Rmax / (exp(numerovIntervals * deltaGrid) - 1.);
 
 		std::vector<std::vector<double>> res;
 
@@ -111,12 +113,26 @@ namespace LAPW
 
 			NormalizeUniform(u, dr);
 
+			// for check, numerically compute the derivative of energy in a different way
+			/*
+			std::vector<double> un = numerov.SolveSchrodingerFull(m_Rmax, l, El + 0.0001, numerovIntervals);
+			NormalizeUniform(un, dr);
+			for (int i = 0; i < u.size(); ++i)
+				un[i] = (un[i] - u[i]) / 0.0001;
+			*/
 
 			const size_t size = u.size();
 			const size_t lastPos = size - 1;
 
-			vals[l].Wavefunction = u[lastPos] / m_Rmax; // Rl = u / r
+			/*
+			std::ofstream thefile;
+			thefile.open("C:\\temp\\test.txt");
+			for (int i = 0; i < u.size(); ++i)
+				thefile << i << ' ' << u[i] << std::endl;
+			thefile << std::endl;
+			*/
 
+			vals[l].Wavefunction = u[lastPos] / m_Rmax; // Rl = u / r
 
 			const double derivStep = numerov.function.GetDerivativeStep(numerovIntervals, /*1*/dr);
 
@@ -126,6 +142,7 @@ namespace LAPW
 
 			// compute the energy derivative of the wavefunction
 			std::vector<double> udot = numerov.SolveGeneral(u, m_Rmax/*numerovIntervals*/, l, El, numerovIntervals);
+
 			// the equation is inhomogeneous, add a particular solution of the homogeneous eqn, alpha * u
 			// get alpha from 6.48 condition
 			// this way udot is orthogonalized with u
@@ -138,6 +155,23 @@ namespace LAPW
 			const double alpha = Integral::Boole(dr, uudot);
 			for (int i = 0; i < size; ++i)
 				udot[i] -= alpha * u[i];
+
+			// udot is correct, I get it basically the same by the two methods
+
+			//udot = un; // use the 'numerical' derivative one, for test
+
+			/*
+			for (int i = 0; i < udot.size(); ++i)
+				thefile << i << ' ' << udot[i] << std::endl;
+			thefile << std::endl;
+
+			// for comparison, the numerical derivative
+			for (int i = 0; i < u.size(); ++i)
+				thefile << i << ' ' << un[i] << std::endl;
+
+			thefile.close();
+			exit(0);
+			*/
 
 			// check:
 			/*
@@ -162,7 +196,7 @@ namespace LAPW
 			for (int i = 0; i < size; ++i)
 				udot[i] *= udot[i];
 				
-			// multiplied by 0.25 for the same reason as the 0.5 above
+			// the 0.25 is for the same reason as 0.5 above
 			vals[l].Nl = 0.25 * Integral::Boole(dr, udot);
 
 			// should be 1, see 6.50 - but if you choose to go further with relations derived for Hartree atomic units, should be 2 (this comes out of the 1/2 of the kinetic term of the Schrodinger eqn).

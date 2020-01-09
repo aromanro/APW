@@ -86,7 +86,7 @@ namespace APW
 			assert(ratios.size() == m_lMax + 1);
 			assert(C.size() == m_lMax + 1);
 
-			H = -E * A + B;
+			H = B - E * A;
 
 			// the -1 below comes from u = r R
 			// in 'ratios' there is u'/u

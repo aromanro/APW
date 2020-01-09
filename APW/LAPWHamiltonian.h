@@ -40,6 +40,8 @@ namespace LAPW
 			const double jl2 = SpecialFunctions::Bessel::j(l, q2_lengthR);
 			const double jlp2 = SpecialFunctions::Bessel::jderiv(l, q2_lengthR) * q2_length;
 
+			// I derived al and bl, the formulas are correct!
+
 			// 6.42b
 			const double al1 = jlp1 * EnergyDerivative - jl1 * BothDerivative;
 			const double al2 = jlp2 * EnergyDerivative - jl2 * BothDerivative;
@@ -48,12 +50,17 @@ namespace LAPW
 			const double bl1 = jl1 * RadialDerivative - jlp1 * Wavefunction;
 			const double bl2 = jl2 * RadialDerivative - jlp2 * Wavefunction;
 
+			// this is for overlap in the muffin, also correct, derived it, too
+
 			// 6.43b
 			const double sl = al1 * al2 + bl1 * bl2 * Nl; 
 
+			// TODO: need to check this!
+
 			// 6.44b
-			const double gammal = EnergyDerivative * RadialDerivative * (jlp1 * jl2 + jl1 * jlp2) -
-				(RadialDerivative * BothDerivative * jl1 * jl2 + Wavefunction * EnergyDerivative * jlp1 * jlp2);
+			const double gammal = EnergyDerivative * RadialDerivative * (jlp1 * jl2 + jl1 * jlp2)
+				- (RadialDerivative * BothDerivative * jl1 * jl2 + Wavefunction * EnergyDerivative * jlp1 * jlp2);
+			//const double gammal = 0.5 * (al1 * bl2 + al2 * bl1); // should be an alternative
 
 			return std::make_pair(sl, gammal);
 		}
@@ -66,6 +73,8 @@ namespace LAPW
 			: m_basisVectors(basisVectors), m_R(R), prefactor(4. * M_PI * R * R / cellVolume), prefactor2(prefactor * R * R)
 		{
 			// compute U, it's the same as A in APW
+			// it's actually the overlap for interstitial, it works for APW so it's good for LAPW, too
+			// it's the integral over the whole space for plane wave, minus the integral for the muffin
 			size_t size = basisVectors.size();
 			U.resize(size, size);
 			const double mtwopref = -prefactor; // -4 * M_PI * R^2 / cellVolume
@@ -82,7 +91,6 @@ namespace LAPW
 				U(i, i) = mtwopref * R / 3. + 1.; // 1 is from delta
 			}
 
-
 			S.resize(size, size);
 			H.resize(size, size);
 		}
@@ -92,6 +100,9 @@ namespace LAPW
 		{
 			const size_t m_lMax = vals.size();
 			const size_t size = m_basisVectors.size();
+
+			// I derived the overlap, it's correct
+			// not yet sure about the whole Hamiltonian, although the interstitial part is correct (and the same as for APW, except the 1/2 factor which is due of the different unit of energy)
 
 			for (size_t i = 0; i < size; ++i)
 			{
@@ -107,13 +118,13 @@ namespace LAPW
 					const double qjlength = sqrt(qj2);
 
 					const double qiqj = qilength * qjlength;
-					double cosTheta = qiqjscalar / qiqj;
+					double cosTheta = (qiqj == 0) ? 1 : qiqjscalar / qiqj;
 					// some numerical issues prevented using std::legendre (the other custom implementation in Legendre::p worked fine), this solves it:
 					if (isnan(cosTheta) || isinf(cosTheta) || cosTheta > 1. || cosTheta < -1) cosTheta = (cosTheta < 0 ? -1 : 1);
 
 					// 6.43a and 6.44a
-					S(i, j) = 0;
-					H(i, j) = 0;
+					double s = 0;
+					double h = 0;
 					
 					for (unsigned int l = 0; l < m_lMax; ++l)
 					{
@@ -123,18 +134,21 @@ namespace LAPW
 						double gammal;
 						std::tie(sl, gammal) = vals[l].ComputeSlGammal(l, m_R, qi, qj);
 
-						const double psl = p * sl;
-						
-						S(i, j) += twolp1 * psl;
+						s += twolp1 * p * sl;
 
 						// the energy is given in Hartrees, whence the 2.
-						const double v = vals[l].El * sl + gammal;
+						// the first term is correct, I think I have issues with the second one
+						const double v = 2. * vals[l].El * sl + gammal;
 
-						H(i, j) += twolp1 * p * v;
+						h += twolp1 * p * v;
 					}
 					
-					S(i, j) = U(i, j) + prefactor2 * S(i, j); 
-					H(i, j) = qiqjscalar * U(i, j) + prefactor2 * H(i, j);
+					// overlap for interstitial + overlap for muffin
+					// this is good
+					S(i, j) = U(i, j) + prefactor2 * s; 
+
+					// Hamiltonian for interstitial (the same as for APW, but without a 0.5 factor due of different energy unit here) + Hamiltonian for muffin
+					H(i, j) = qiqjscalar * U(i, j) + prefactor2 * h;
 
 					if (i != j)
 					{
@@ -147,8 +161,9 @@ namespace LAPW
 
 
 		Eigen::VectorXd GetEnergies() const
-		{
-			Eigen::GeneralizedSelfAdjointEigenSolver<Eigen::MatrixXd> es(H, S);
+		{			
+			Eigen::GeneralizedSelfAdjointEigenSolver<Eigen::MatrixXd> es(H, S, Eigen::DecompositionOptions::EigenvaluesOnly);
+
 			return es.eigenvalues();
 		}
 

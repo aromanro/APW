@@ -338,14 +338,13 @@ namespace APW {
 		// to be noted that src should be multiplied by 2 because the kinetic term in Schrodinger has 1/2 in it
 		// for the same reason the operator() for the 'function' has a multiplication with 2
 
-		//WARNING: It's not tested yet, there is a good change I made a mistake at some sign or something like that
-		// almost sure it's wrong for non uniform, must check this, so first make it work with uniform!
+		// WARNING: it's wrong for non uniform, I'll have to derive things for this, too :(
+		// it's tested against the numerical energy derivative of the wavefunction, seems to work ok
 
 		inline std::vector<double> SolveGeneral(const std::vector<double>& src, double endPoint, unsigned int l, double E, long int steps)
 		{
 			const long int highLimit = steps + 1;
 			std::vector<double> Psi(highLimit);
-
 
 			if (NumerovFunction::IsUniform())
 			{
@@ -399,7 +398,7 @@ namespace APW {
 
 				solution = getU(w, funcVal, srcVal);
 
-				Psi[i] = function.GetWavefunctionValue(i, solution); // already adjusted for the case of the non uniform grid
+				Psi[i] = function.GetWavefunctionValue(i, solution); 
 			}
 
 			return Psi;
