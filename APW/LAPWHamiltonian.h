@@ -95,14 +95,12 @@ namespace LAPW
 			H.resize(size, size);
 		}
 
-		// TODO: looks like I'll have to derive it myself, with the formulae from the book I don't get correct values :(
 		void Compute(const Vector3D<double>& k, const std::vector<Values>& vals)
 		{
 			const size_t m_lMax = vals.size();
 			const size_t size = m_basisVectors.size();
 
-			// I derived the overlap, it's correct
-			// not yet sure about the whole Hamiltonian, although the interstitial part is correct (and the same as for APW, except the 1/2 factor which is due of the different unit of energy)
+			// I derived everything, it's correct
 
 			for (size_t i = 0; i < size; ++i)
 			{

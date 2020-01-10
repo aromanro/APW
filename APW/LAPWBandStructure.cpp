@@ -84,7 +84,6 @@ namespace LAPW
 
 
 		std::vector<Values> vals(lMax + 1);
-		// for now fix them all at the same energy
 		vals[0].El = vals[1].El = vals[2].El = 0.2;
 		vals[3].El = 0.22;
 		vals[4].El = 0.25;
@@ -92,9 +91,6 @@ namespace LAPW
 		vals[6].El = 0.3;
 		vals[7].El = 0.4;
 		vals[8].El = 0.5;
-
-		// TODO: must check this, probably has mistakes
-		// tried it, it does not work, something is still not ok
 
 		const double R2 = m_Rmax * m_Rmax;
 
