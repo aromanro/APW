@@ -51,9 +51,6 @@
     <ClCompile Include="LAPWBandStructure.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="LAPWHamiltonian.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="SymmetryPoints.h">

@@ -176,7 +176,6 @@
     <ClCompile Include="BandStructureBasis.cpp" />
     <ClCompile Include="ChemUtils.cpp" />
     <ClCompile Include="LAPWBandStructure.cpp" />
-    <ClCompile Include="LAPWHamiltonian.cpp" />
     <ClCompile Include="Options.cpp" />
     <ClCompile Include="OptionsFrame.cpp" />
     <ClCompile Include="Pseudopotential.cpp" />

@@ -1,11 +1,6 @@
 #include "LAPWBandStructure.h"
 
-
-
 #include <future>
-
-#include <iostream>
-#include <fstream>
 
 #include "LAPWBandStructure.h"
 #include "LAPWHamiltonian.h"
@@ -120,14 +115,6 @@ namespace LAPW
 			const size_t size = u.size();
 			const size_t lastPos = size - 1;
 
-			/*
-			std::ofstream thefile;
-			thefile.open("C:\\temp\\test.txt");
-			for (int i = 0; i < u.size(); ++i)
-				thefile << i << ' ' << u[i] << std::endl;
-			thefile << std::endl;
-			*/
-
 			vals[l].Wavefunction = u[lastPos] / m_Rmax; // Rl = u / r
 
 			const double derivStep = numerov.function.GetDerivativeStep(numerovIntervals, /*1*/dr);
@@ -155,19 +142,6 @@ namespace LAPW
 			// udot is correct, I get it basically the same by the two methods
 
 			//udot = un; // use the 'numerical' derivative one, for test
-
-			/*
-			for (int i = 0; i < udot.size(); ++i)
-				thefile << i << ' ' << udot[i] << std::endl;
-			thefile << std::endl;
-
-			// for comparison, the numerical derivative
-			for (int i = 0; i < u.size(); ++i)
-				thefile << i << ' ' << un[i] << std::endl;
-
-			thefile.close();
-			exit(0);
-			*/
 
 			// check:
 			/*
