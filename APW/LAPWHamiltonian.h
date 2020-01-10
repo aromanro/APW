@@ -55,12 +55,12 @@ namespace LAPW
 			// 6.43b
 			const double sl = al1 * al2 + bl1 * bl2 * Nl; 
 
-			// TODO: need to check this!
-
 			// 6.44b
 			const double gammal = EnergyDerivative * RadialDerivative * (jlp1 * jl2 + jl1 * jlp2)
 				- (RadialDerivative * BothDerivative * jl1 * jl2 + Wavefunction * EnergyDerivative * jlp1 * jlp2);
-			//const double gammal = 0.5 * (al1 * bl2 + al2 * bl1); // should be an alternative
+			
+			// this is an alternative, if this is used, use the commented 0.5 * (qi2 + qj2) in the Hamiltonian for the intersitial, instead of qi * qj!
+			//const double gammal = 0.5 * (al1 * bl2 + al2 * bl1);
 
 			return std::make_pair(sl, gammal);
 		}
@@ -138,6 +138,7 @@ namespace LAPW
 
 						// the energy is given in Hartrees, whence the 2.
 						// the first term is correct, I think I have issues with the second one
+						// gammal is the matrix element for H - E, that's why the E * overlap (in the muffin) is added
 						const double v = 2. * vals[l].El * sl + gammal;
 
 						h += twolp1 * p * v;
@@ -146,9 +147,10 @@ namespace LAPW
 					// overlap for interstitial + overlap for muffin
 					// this is good
 					S(i, j) = U(i, j) + prefactor2 * s; 
-
+					
 					// Hamiltonian for interstitial (the same as for APW, but without a 0.5 factor due of different energy unit here) + Hamiltonian for muffin
-					H(i, j) = qiqjscalar * U(i, j) + prefactor2 * h;
+					// the commented factor is for the alternative gamma commented in ComputeSlGammal
+					H(i, j) = qiqjscalar /*0.5 * (qi2 + qj2)*/ * U(i, j) + prefactor2 * h;
 
 					if (i != j)
 					{

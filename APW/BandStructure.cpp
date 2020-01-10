@@ -107,12 +107,12 @@ namespace APW
 
 			tasks[t] = std::async(launchType, [this, startPos, nextPos, numIntervals, minE, dE, lMax, &ratios, &res, &terminate]()->void
 				{
-					Hamiltonian hamiltonian(basisVectors, m_Rmax, m_a, m_a * m_a * m_a / 4., lMax);
+					Secular secular(basisVectors, m_Rmax, m_a, m_a * m_a * m_a / 4., lMax);
 
 					// now, loop over k points
 					for (int k = startPos; k < nextPos && !terminate; ++k)
 					{
-						hamiltonian.ComputeBC(kpoints[k]);
+						secular.ComputeBC(kpoints[k]);
 
 						// loop over all energies
 						double olderDet = 0;
@@ -138,9 +138,9 @@ namespace APW
 							}
 
 
-							hamiltonian.ComputeHamiltonian(E, ratios[posE]);
+							secular.ComputeHamiltonian(E, ratios[posE]);
 
-							const double det = hamiltonian.Determinant();
+							const double det = secular.Determinant();
 
 							if (posE > 0 && det * oldDet < 0) // change in sign
 							{

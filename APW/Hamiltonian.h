@@ -16,15 +16,15 @@
 namespace APW
 {
 
-	class Hamiltonian
+	class Secular
 	{
 	public:
-		Hamiltonian(const std::vector<Vector3D<double>>& basisVectors, double R, double a, double cellVolume, unsigned int lmax)
+		Secular(const std::vector<Vector3D<double>>& basisVectors, double R, double a, double cellVolume, unsigned int lmax)
 		: m_basisVectors(basisVectors), m_R(R), prefactor(2. * M_PI * R / cellVolume), m_lMax(lmax)
 		{		
 			// compute A
 			const size_t size = basisVectors.size();
-			A.resize(size, size);			
+			OverlapInterstitial.resize(size, size);
 			const double mtwopref = -2. * prefactor * R; // -4 * M_PI * R^2 / cellVolume
 
 			for (size_t i = 0; i < size; ++i)
@@ -33,14 +33,14 @@ namespace APW
 				{
 					const double dist = (m_basisVectors[i] - m_basisVectors[j]).Length();
 
-					A(j, i) = A(i, j) = mtwopref * SpecialFunctions::Bessel::j(1, dist * R) / dist;
+					OverlapInterstitial(j, i) = OverlapInterstitial(i, j) = mtwopref * SpecialFunctions::Bessel::j(1, dist * R) / dist;
 				}
 				
-				A(i, i) = mtwopref * R / 3. + 1; // 1 is from delta
+				OverlapInterstitial(i, i) = mtwopref * R / 3. + 1; // 1 is from delta
 			}
 
 			// used for computing B
-			Ahalf = 0.5 * A; // 0.5 is from hbar / (2 * me), in atomic units becomes 1/2
+			OverlapInterstitialHalf = 0.5 * OverlapInterstitial; // 0.5 is from hbar / (2 * me), in atomic units becomes 1/2
 
 			B.resize(size, size);
 			C.resize(lmax + 1ULL); 
@@ -61,7 +61,7 @@ namespace APW
 					const Vector3D<double> qj = m_basisVectors[j] + k;
 					const double qiqjscalar = qi * qj;
 
-					B(i, j) = B(j, i) = Ahalf(i, j) * qiqjscalar;
+					B(i, j) = B(j, i) = OverlapInterstitialHalf(i, j) * qiqjscalar;
 
 					// compute C
 					const double qilength = qi.Length();
@@ -86,7 +86,7 @@ namespace APW
 			assert(ratios.size() == m_lMax + 1);
 			assert(C.size() == m_lMax + 1);
 
-			H = B - E * A;
+			H = B - E * OverlapInterstitial;
 
 			// the -1 below comes from u = r R
 			// in 'ratios' there is u'/u
@@ -112,8 +112,8 @@ namespace APW
 		const unsigned int m_lMax;
 
 		// see 6.35 for calculation details
-		Eigen::MatrixXd A;
-		Eigen::MatrixXd Ahalf; // 0.5 * A, will be used to compute B
+		Eigen::MatrixXd OverlapInterstitial; // noted with A in the book
+		Eigen::MatrixXd OverlapInterstitialHalf; // 0.5 * A, will be used to compute B
 
 		// Call ComputeBC to fill those, needs k, so each time k is changing, call it again
 		Eigen::MatrixXd B; // 0.5 * Aij * qi * qj

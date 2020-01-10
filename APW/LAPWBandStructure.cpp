@@ -59,7 +59,7 @@ namespace LAPW
 
 	std::vector<std::vector<double>> BandStructure::Compute(const std::atomic_bool& terminate, const Options& options)
 	{
-		const int numerovIntervals = 16000;
+		const int numerovIntervals = 2000;// 16000;
 		const int numerovGridNodes = numerovIntervals + 1;
 		const double dr = m_Rmax / numerovIntervals;
 
@@ -86,12 +86,12 @@ namespace LAPW
 		std::vector<Values> vals(lMax + 1);
 		// for now fix them all at the same energy
 		vals[0].El = vals[1].El = vals[2].El = 0.2;
-		vals[3].El = 0.2;
-		vals[4].El = 0.2;
-		vals[5].El = 0.2;
-		vals[6].El = 0.2;
-		vals[7].El = 0.2;
-		vals[8].El = 0.2;
+		vals[3].El = 0.22;
+		vals[4].El = 0.25;
+		vals[5].El = 0.28;
+		vals[6].El = 0.3;
+		vals[7].El = 0.4;
+		vals[8].El = 0.5;
 
 		// TODO: must check this, probably has mistakes
 		// tried it, it does not work, something is still not ok
@@ -118,7 +118,7 @@ namespace LAPW
 			std::vector<double> un = numerov.SolveSchrodingerFull(m_Rmax, l, El + 0.0001, numerovIntervals);
 			NormalizeUniform(un, dr);
 			for (int i = 0; i < u.size(); ++i)
-				un[i] = (un[i] - u[i]) / 0.0001;
+				un[i] = (un[i] - u[i]) / 0.0001; // (wavefunction(E + dE) - wavefunction(E)) / dE
 			*/
 
 			const size_t size = u.size();
@@ -183,7 +183,7 @@ namespace LAPW
 			*/
 
 			// the formulae were derived with Rydberg atomic units, but the program uses Hartrees, so convert the derivatives to use Rydbergs for formulae
-			// d/d 2E = 0.5 d/dE
+			// d/d(2E) = 0.5 d/dE
 			// so the two multiplications with 0.5 that follow are for this reason
 
 			vals[l].EnergyDerivative = 0.5 * udot[lastPos] / m_Rmax;
@@ -225,19 +225,20 @@ namespace LAPW
 			if (nextPos > kpoints.size()) nextPos = kpoints.size();
 
 			tasks[t] = std::async(launchType, [this, startPos, nextPos, lMax, &vals, &res, &terminate]()->void
-				{
-					Hamiltonian hamiltonian(basisVectors, m_Rmax, m_a, m_a * m_a * m_a / 4.);
+				{					
+					Hamiltonian hamiltonian(basisVectors, m_Rmax, m_a, m_a* m_a* m_a / 4.);
 
 					// now, loop over k points
 					for (int k = startPos; k < nextPos && !terminate; ++k)
 					{
-						hamiltonian.Compute(k, vals);
+						hamiltonian.Compute(kpoints[k], vals);
 						const Eigen::VectorXd v = hamiltonian.GetEnergies();
 						for (int i = 0; i < v.rows(); ++i)
 						{
 							const double val = 0.5 * v(i); // the formulae were with Rydbergs, convert back to Hartrees
-							if (val > 0.8)
-								break;
+							if (val > 0.8) break;
+							else if (val < -0.05) continue;
+
 							res[k].push_back(val); 
 						}
 
