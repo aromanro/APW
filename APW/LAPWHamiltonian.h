@@ -135,7 +135,6 @@ namespace LAPW
 						s += twolp1 * p * sl;
 
 						// the energy is given in Hartrees, whence the 2.
-						// the first term is correct, I think I have issues with the second one
 						// gammal is the matrix element for H - E, that's why the E * overlap (in the muffin) is added
 						const double v = 2. * vals[l].El * sl + gammal;
 
