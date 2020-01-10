@@ -237,7 +237,6 @@ namespace LAPW
 						{
 							const double val = 0.5 * v(i); // the formulae were with Rydbergs, convert back to Hartrees
 							if (val > 0.8) break;
-							else if (val < -0.05) continue;
 
 							res[k].push_back(val); 
 						}
