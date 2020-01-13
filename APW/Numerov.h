@@ -175,6 +175,11 @@ namespace APW {
 			return exp(0.5 * posIndex * m_delta) * value;
 		}
 
+		// NOTE: This makes the 'general' solver below less general
+		// as it is, it's targeted to the eqn (H-E)udot = u (6.46 in the book)
+		// if you want it to be more general, use Rp * exp(posIndex * m_delta)
+		// and adjust the 'source' term before passing it to the solver
+
 		inline double GetSrcAdjustedValue(size_t posIndex, double value) const
 		{
 			return value * Rp2delta2 * exp(1.5 * posIndex * m_delta);
@@ -336,8 +341,8 @@ namespace APW {
 		// to be noted that src should be multiplied by 2 because the kinetic term in Schrodinger has 1/2 in it
 		// for the same reason the operator() for the 'function' has a multiplication with 2
 
-		// WARNING: it's wrong for non uniform, I'll have to derive things for this, too :(
-		// it's tested against the numerical energy derivative of the wavefunction, seems to work ok
+		// NOTE: it's made less general for the non-uniform grid, targeted at eqn (H-E)udot = u (6.46 in the book)
+		// see above the comment in NumerovFunctionNonUniformGrid class
 
 		inline std::vector<double> SolveGeneral(const std::vector<double>& src, double endPoint, unsigned int l, double E, long int steps)
 		{
