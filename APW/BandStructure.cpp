@@ -107,7 +107,7 @@ namespace APW
 
 			tasks[t] = std::async(launchType, [this, startPos, nextPos, numIntervals, minE, dE, lMax, &ratios, &res, &terminate]()->void
 				{
-					Secular secular(basisVectors, m_Rmax, m_a, m_a * m_a * m_a / 4., lMax);
+					Secular secular(basisVectors, m_Rmax, m_a * m_a * m_a / 4., lMax);
 
 					// now, loop over k points
 					for (int k = startPos; k < nextPos && !terminate; ++k)

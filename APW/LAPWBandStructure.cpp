@@ -35,9 +35,6 @@ namespace LAPW
 		std::vector<double> result2(size);
 		for (int i = 0; i < size; ++i)
 		{
-			// if nonuniform, convert the function back!!!!!
-			//Psi[i] *= exp(i * deltaGrid * 0.5); // it's already converted in numerov
-
 			result2[i] = Psi[i] * Psi[i];
 
 			// if nonuniform, do the change for dr	
@@ -56,13 +53,13 @@ namespace LAPW
 	{
 		const int numerovIntervals = 2000;// 16000;
 		const int numerovGridNodes = numerovIntervals + 1;
-		const double dr = m_Rmax / numerovIntervals;
+		//const double dr = m_Rmax / numerovIntervals; // for uniform
 
 		const size_t lMax = 8;
 
 		// the following two are needed for the non-uniform grid computations
-		//const double deltaGrid = 0.005;
-		//const double Rp = m_Rmax / (exp(numerovIntervals * deltaGrid) - 1.);
+		const double deltaGrid = 0.005;
+		const double Rp = m_Rmax / (exp(numerovIntervals * deltaGrid) - 1.);
 
 		std::vector<std::vector<double>> res;
 
@@ -71,8 +68,8 @@ namespace LAPW
 		potential.m_potentialValues.resize(numerovGridNodes);
 		for (int i = 0; i < numerovGridNodes; ++i)
 		{
-			const double r = i * dr; // for uniform grid
-			//const double r = Rp * (exp(i * deltaGrid) - 1.);
+			//const double r = i * dr; // for uniform grid
+			const double r = Rp * (exp(i * deltaGrid) - 1.);
 			potential.m_potentialValues[i] = -APW::Pseudopotential::VeffCu(r) / r;
 			//potential.m_potentialValues[i] = pseudopotential.Value(r);
 		}
@@ -80,12 +77,12 @@ namespace LAPW
 
 		std::vector<Values> vals(lMax + 1);
 		vals[0].El = vals[1].El = vals[2].El = 0.2;
-		vals[3].El = 0.22;
+		vals[3].El = 0.225;
 		vals[4].El = 0.25;
-		vals[5].El = 0.28;
+		vals[5].El = 0.275;
 		vals[6].El = 0.3;
 		vals[7].El = 0.4;
-		vals[8].El = 0.5;
+		vals[8].El = 0.6;
 
 		const double R2 = m_Rmax * m_Rmax;
 
@@ -94,20 +91,19 @@ namespace LAPW
 			const double El = vals[l].El;
 
 			// compute wavefunction
-			APW::Numerov<APW::NumerovFunctionRegularGrid> numerov(potential, 0, m_Rmax, numerovGridNodes);
-			//APW::Numerov<APW::NumerovFunctionNonUniformGrid> numerov(potential, deltaGrid, m_Rmax, numerovGridNodes);
+			//APW::Numerov<APW::NumerovFunctionRegularGrid> numerov(potential, 0, m_Rmax, numerovGridNodes);
+			APW::Numerov<APW::NumerovFunctionNonUniformGrid> numerov(potential, deltaGrid, m_Rmax, numerovGridNodes);
 
-			std::vector<double> u = numerov.SolveSchrodingerFull(m_Rmax/*numerovIntervals*/, l, El, numerovIntervals);
+			std::vector<double> u = numerov.SolveSchrodingerFull(/*m_Rmax*/numerovIntervals, l, El, numerovIntervals);
 
 			// normalize it
-			//NormalizeNonUniform(u, Rp, deltaGrid);
-
-			NormalizeUniform(u, dr);
+			//NormalizeUniform(u, dr);
+			NormalizeNonUniform(u, Rp, deltaGrid);
 
 			// for check, numerically compute the derivative of energy in a different way
 			/*
-			std::vector<double> un = numerov.SolveSchrodingerFull(m_Rmax, l, El + 0.0001, numerovIntervals);
-			NormalizeUniform(un, dr);
+			std::vector<double> un = numerov.SolveSchrodingerFull(numerovIntervals, l, El + 0.0001, numerovIntervals);
+			NormalizeNonUniform(un, Rp, deltaGrid);
 			for (int i = 0; i < u.size(); ++i)
 				un[i] = (un[i] - u[i]) / 0.0001; // (wavefunction(E + dE) - wavefunction(E)) / dE
 			*/
@@ -117,25 +113,29 @@ namespace LAPW
 
 			vals[l].Wavefunction = u[lastPos] / m_Rmax; // Rl = u / r
 
-			const double derivStep = numerov.function.GetDerivativeStep(numerovIntervals, /*1*/dr);
+			const double derivStep = numerov.function.GetDerivativeStep(numerovIntervals, 1/*dr*/);
 
 			// compute its radial derivative
 			const double up = (u[lastPos] - u[lastPos - 1]) / derivStep;
 			vals[l].RadialDerivative = up / m_Rmax - u[lastPos] / R2;
 
 			// compute the energy derivative of the wavefunction
-			std::vector<double> udot = numerov.SolveGeneral(u, m_Rmax/*numerovIntervals*/, l, El, numerovIntervals);
+			std::vector<double> udot = numerov.SolveGeneral(u, /*m_Rmax*/numerovIntervals, l, El, numerovIntervals);
 
 			// the equation is inhomogeneous, add a particular solution of the homogeneous eqn, alpha * u
 			// get alpha from 6.48 condition
-			// this way udot is orthogonalized with u
+			// this way udot is orthogonalized with u, by subtracting the projection of udot on u (that is, alpha * u)
 
 			// fill it with u * udot
 			std::vector<double> uudot(size);
 			for (int i = 0; i < size; ++i)
-				uudot[i] = u[i] * udot[i];
+			{
+				// if nonuniform, do the change for dr
+				const double cnst = Rp * deltaGrid * exp(deltaGrid * i);
+				uudot[i] = u[i] * udot[i] * cnst;
+			}
 
-			const double alpha = Integral::Boole(dr, uudot);
+			const double alpha = Integral::Boole(1/*dr*/, uudot);
 			for (int i = 0; i < size; ++i)
 				udot[i] -= alpha * u[i];
 
@@ -147,9 +147,11 @@ namespace LAPW
 			/*
 			std::vector<double> udotu(size);
 			for (int i = 0; i < size; ++i)
-				udotu[i] = udot[i] * u[i];
-
-			const double sum = Integral::Boole(dr, udotu); // should be very close to zero
+			{
+				const double cnst = Rp * deltaGrid * exp(deltaGrid * i);
+				udotu[i] = udot[i] * u[i] * cnst;
+			}
+			const double sum = Integral::Boole(1, udotu); // should be very close to zero
 			*/
 
 			// the formulae were derived with Rydberg atomic units, but the program uses Hartrees, so convert the derivatives to use Rydbergs for formulae
@@ -164,10 +166,14 @@ namespace LAPW
 
 			// 6.49
 			for (int i = 0; i < size; ++i)
-				udot[i] *= udot[i];
+			{
+				// if nonuniform, do the change for dr	
+				const double cnst = Rp * deltaGrid * exp(deltaGrid * i);
+				udot[i] *= udot[i] * cnst;
+			}
 				
 			// the 0.25 is for the same reason as 0.5 above
-			vals[l].Nl = 0.25 * Integral::Boole(dr, udot);
+			vals[l].Nl = 0.25 * Integral::Boole(1/*dr*/, udot);
 
 			// should be 1, see 6.50 - but if you choose to go further with relations derived for Hartree atomic units, should be 2 (this comes out of the 1/2 of the kinetic term of the Schrodinger eqn).
 			//const double val = m_Rmax * m_Rmax * (vals[l].RadialDerivative * vals[l].EnergyDerivative - vals[l].Wavefunction * vals[l].BothDerivative); 		
@@ -196,7 +202,7 @@ namespace LAPW
 
 			tasks[t] = std::async(launchType, [this, startPos, nextPos, lMax, &vals, &res, &terminate]()->void
 				{					
-					Hamiltonian hamiltonian(basisVectors, m_Rmax, m_a, m_a* m_a* m_a / 4.);
+					Hamiltonian hamiltonian(basisVectors, m_Rmax, m_a* m_a* m_a / 4.);
 
 					// now, loop over k points
 					for (int k = startPos; k < nextPos && !terminate; ++k)

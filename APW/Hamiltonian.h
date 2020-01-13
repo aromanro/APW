@@ -19,7 +19,7 @@ namespace APW
 	class Secular
 	{
 	public:
-		Secular(const std::vector<Vector3D<double>>& basisVectors, double R, double a, double cellVolume, unsigned int lmax)
+		Secular(const std::vector<Vector3D<double>>& basisVectors, double R, double cellVolume, unsigned int lmax)
 		: m_basisVectors(basisVectors), m_R(R), prefactor(2. * M_PI * R / cellVolume), m_lMax(lmax)
 		{		
 			// compute A

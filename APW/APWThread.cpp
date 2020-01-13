@@ -28,7 +28,10 @@ void APWThread::join()
 
 void APWThread::Calculate()
 {
-	results = m_frame->bandStructure.Compute(terminate, m_options);
+	if (0 == m_options.method)
+		results = m_frame->bandStructureAPW.Compute(terminate, m_options);
+	else
+		results = m_frame->bandStructureLAPW.Compute(terminate, m_options);
 
 	--m_frame->runningThreads;
 }

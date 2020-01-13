@@ -24,6 +24,7 @@ Options::Options()
 			{"G", "X", "W", "K", "G", "L", "U", "W", "L", "K"},
 			{"G", "X", "U", "K", "G", "L", "W", "X"},
 		} },
+	method(1),
 	m_fileconfig(nullptr)
 {
 }
@@ -60,6 +61,7 @@ void Options::Load()
 		nrThreads = conf->ReadLong("/nrThreads", 4);
 		nrPoints = conf->ReadLong("/nrPoints", 600);
 		pathNo = conf->ReadLong("/pathNo", 10);
+		method = conf->ReadLong("/method", 1);
 	}
 	Close();
 }
@@ -73,6 +75,7 @@ void Options::Save()
 		conf->Write("/nrThreads", static_cast<long int>(nrThreads));
 		conf->Write("/nrPoints", static_cast<long int>(nrPoints));
 		conf->Write("/pathNo", static_cast<long int>(pathNo));
+		conf->Write("/method", static_cast<long int>(method));
 	}
 
 	if (m_fileconfig)

@@ -13,11 +13,12 @@
 #define ID_NRTHREADS 101
 #define ID_NRPOINTS 103
 #define ID_PATH 104
+#define ID_METHOD 105
 
 wxDECLARE_APP(APWApp);
 
 OptionsFrame::OptionsFrame(const wxString& title, wxWindow* parent)
-	: wxDialog(parent, wxID_ANY, title, wxDefaultPosition, wxSize(400, 200))
+	: wxDialog(parent, wxID_ANY, title, wxDefaultPosition, wxSize(400, 290))
 {
 	CreateControls();
 
@@ -95,6 +96,15 @@ void OptionsFrame::CreateControls()
 
 	delete[] pathStrings;
 
+	box = new wxBoxSizer(wxHORIZONTAL);
+	boxSizer->Add(box, 0, wxGROW | wxALL, 5);
+
+	wxArrayString choices;
+	choices.Add("APW");
+	choices.Add("LAPW");
+	wxRadioBox* m_radioBox = new wxRadioBox(this, ID_METHOD, "Method", wxDefaultPosition, wxDefaultSize, choices, 2, wxRA_VERTICAL);
+	box->Add(m_radioBox, 0, wxALIGN_CENTER_VERTICAL | wxALL, 5);
+
 	// ******************************************************************
 	// setting validators
 
@@ -112,6 +122,7 @@ void OptionsFrame::CreateControls()
 
 	pathChoice->SetValidator(wxGenericValidator(&options.pathNo));
 
+	m_radioBox->SetValidator(wxGenericValidator(&options.method));
 
 	// ******************************************************************
 

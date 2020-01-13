@@ -24,6 +24,7 @@ public:
 		nrPoints(other.nrPoints),
 		pathNo(other.pathNo),
 		paths(other.paths),
+		method(other.method),
 		m_fileconfig(nullptr)
 	{
 	}
@@ -34,6 +35,7 @@ public:
 		nrPoints = other.nrPoints;
 		pathNo = other.pathNo;
 		paths = other.paths;
+		method = other.method;
 		m_fileconfig = nullptr;
 
 		return *this;
@@ -47,6 +49,8 @@ public:
 	int nrPoints;
 
 	int pathNo;
+
+	int method;
 
 	std::vector<std::vector<std::string>> paths;
 

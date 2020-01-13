@@ -46,22 +46,22 @@ namespace APW {
 			return std::min(GetMaxRadius(E, maxIndex) / stepSize, static_cast<double>(maxIndex));
 		}
 
-		inline static double GetDerivativeStep(int posIndex, double h)
+		inline static double GetDerivativeStep(int /*posIndex*/, double h)
 		{
 			return h;
 		}
 
-		inline static double GetMaxRadius(double E, size_t maxIndex)
+		inline static double GetMaxRadius(double E, size_t /*maxIndex*/)
 		{
 			return 200. / sqrt(2. * abs(E));
 		}
 
-		inline static double GetWavefunctionValue(size_t posIndex, double value)
+		inline static double GetWavefunctionValue(size_t /*posIndex*/, double value)
 		{
 			return value;
 		}
 
-		inline double GetSrcAdjustedValue(size_t posIndex, double value) const
+		inline double GetSrcAdjustedValue(size_t /*posIndex*/, double value) const
 		{
 			return value;
 		}
@@ -165,19 +165,19 @@ namespace APW {
 			return Rp * (exp(maxIndex * m_delta) - 1.);
 		}
 
-		inline double GetDerivativeStep(int posIndex, double h) const
+		inline double GetDerivativeStep(int posIndex, double /*h*/) const
 		{
 			return Rp * exp(posIndex * m_delta) * (1. - exp(-m_delta));
 		}
 
 		inline double GetWavefunctionValue(size_t posIndex, double value) const
 		{
-			return exp(posIndex * m_delta * 0.5) * value;
+			return exp(0.5 * posIndex * m_delta) * value;
 		}
 
 		inline double GetSrcAdjustedValue(size_t posIndex, double value) const
 		{
-			return exp(-0.5 * posIndex * m_delta) * value;
+			return value * Rp2delta2 * exp(1.5 * posIndex * m_delta);
 		}
 
 
@@ -234,13 +234,12 @@ namespace APW {
 			}
 
 			double position = 0;
-			double prevSol = 0;
 			double solution = 0;
 			double wprev = 0;
 
 			double oldSolution = 0;
 
-			position += h;
+			position = h;
 			solution = function.GetBoundaryValueZero(position, l);
 			double funcVal = function(l, E, position, 1);
 			double w = (1. - h2p12 * funcVal) * solution;
@@ -297,13 +296,12 @@ namespace APW {
 			}
 
 			double position = 0;
-			double prevSol = 0;
 			double solution = 0;
 			double wprev = 0;
 
 			Psi[0] = function.GetWavefunctionValue(0, solution);
 
-			position += h;
+			position = h;
 			solution = function.GetBoundaryValueZero(position, l);
 
 			Psi[1] = function.GetWavefunctionValue(1, solution);
@@ -367,14 +365,13 @@ namespace APW {
 
 
 			double position = 0;
-			double prevSol = 0;
 			double solution = 0;
 			double srcVal = function.GetSrcAdjustedValue(0, 2. * src[0]);
 			double wprev = h2p12 * srcVal;
 
 			Psi[0] = function.GetWavefunctionValue(0, solution);
 
-			position += h;
+			position = h;
 			solution = function.GetBoundaryValueZero(position, l);
 
 			Psi[1] = function.GetWavefunctionValue(1, solution);

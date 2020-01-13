@@ -61,7 +61,8 @@ public:
 
 	std::atomic_int runningThreads;
 
-	APW::BandStructure bandStructure;
+	APW::BandStructure bandStructureAPW;
+	LAPW::BandStructure bandStructureLAPW;
 
 	Options currentOptions; // what's edited
 

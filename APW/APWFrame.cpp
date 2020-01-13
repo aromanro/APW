@@ -235,7 +235,10 @@ void APWFrame::Compute()
 
 	SetTitle("Computing - APW");
 
-	bandStructure.Initialize(computeOptions.paths[computeOptions.pathNo], computeOptions.nrPoints);
+	if (0 == computeOptions.method)
+		bandStructureAPW.Initialize(computeOptions.paths[computeOptions.pathNo], computeOptions.nrPoints);
+	else
+		bandStructureLAPW.Initialize(computeOptions.paths[computeOptions.pathNo], computeOptions.nrPoints);
 
 	
 	unsigned int nrThreads = computeOptions.nrThreads;
@@ -314,12 +317,22 @@ void APWFrame::StopThreads(bool cancel)
 	theThread.join();
 
 	if (!cancel)
-		bandStructure.results = theThread.results;
+	{
+		if (0 == computeOptions.method)
+			bandStructureAPW.results = theThread.results;
+		else
+			bandStructureLAPW.results = theThread.results;
+	}
 
 	SetTitle("Finished - APW");
 
 	if (!cancel)
-		ConfigureVTK("Cu", bandStructure.results, bandStructure.symmetryPointsPositions, bandStructure.GetPath());
+	{
+		if (0 == computeOptions.method)
+			ConfigureVTK("Cu", bandStructureAPW.results, bandStructureAPW.symmetryPointsPositions, bandStructureAPW.GetPath());
+		else
+			ConfigureVTK("Cu", bandStructureLAPW.results, bandStructureLAPW.symmetryPointsPositions, bandStructureLAPW.GetPath());
+	}
 
 	if (wxIsBusy()) wxEndBusyCursor();
 }

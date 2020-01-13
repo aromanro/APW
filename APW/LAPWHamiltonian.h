@@ -69,7 +69,7 @@ namespace LAPW
 	class Hamiltonian
 	{
 	public:
-		Hamiltonian(const std::vector<Vector3D<double>>& basisVectors, double R, double a, double cellVolume)
+		Hamiltonian(const std::vector<Vector3D<double>>& basisVectors, double R, double cellVolume)
 			: m_basisVectors(basisVectors), m_R(R), prefactor(4. * M_PI * R * R / cellVolume), prefactor2(prefactor * R * R)
 		{
 			// compute U, it's the same as A in APW
