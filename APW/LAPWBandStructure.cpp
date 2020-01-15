@@ -55,7 +55,7 @@ namespace LAPW
 		const int numerovGridNodes = numerovIntervals + 1;
 		//const double dr = m_Rmax / numerovIntervals; // for uniform
 
-		const size_t lMax = 5;
+		const size_t lMax = 8;
 
 		// the following two are needed for the non-uniform grid computations
 		const double deltaGrid = 0.005;
@@ -77,9 +77,13 @@ namespace LAPW
 
 		std::vector<Values> vals(lMax + 1);
 		vals[0].El = vals[1].El = vals[2].El = 0.2;
-		vals[3].El = 0.3;
-		vals[4].El = 0.4;
-		vals[5].El = 0.6;
+		vals[3].El = 0.25;
+		vals[4].El = 0.3;
+		vals[5].El = 0.4;
+		vals[6].El = 0.5;
+		vals[7].El = 0.6;
+		vals[7].El = 0.7;
+
 
 		const double R2 = m_Rmax * m_Rmax;
 

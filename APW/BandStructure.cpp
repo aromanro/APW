@@ -23,7 +23,7 @@ namespace APW
 
 		//const double dr = m_Rmax / numerovIntervals;
 
-		const size_t lMax = 5;
+		const size_t lMax = 8;
 
 		// the following two are needed for the non-uniform grid computations
 		const double deltaGrid = 0.005;
