@@ -1,7 +1,7 @@
 # APW
-Augmented Plane Waves, band structure computation
+Augmented Plane Waves (both APW and LAPW), band structure computation
 
-Band structure for Cu, using augmented plane waves (both APW and LAPW), the main reference is Computational Physics by Jos Thijssen
+Band structure for Cu, using augmented plane waves, the main reference is Computational Physics by Jos Thijssen
 https://www.cambridge.org/core/books/computational-physics/BEE73B0139D4A9993193B57CDC62096E
 
 Description is on Computational Physics Blog: https://compphys.go.ro/augmented-plane-waves/
