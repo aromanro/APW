@@ -1,0 +1,17 @@
+
+*.obj
+*.tlog
+*.ipch
+.vs/APW/v16/.suo
+.vs/APW/v16/Browse.VC.db
+*.log
+*.idb
+*.pdb
+*.ilk
+*.exe
+*.ipdb
+*.iobj
+*.lps
+*.sarif
+*.lastcodeanalysissucceeded
+*.txt
