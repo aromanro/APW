@@ -27,7 +27,7 @@ namespace LAPW
 
 		std::vector<std::vector<double>> results;
 
-		virtual void Initialize(std::vector<std::string> path, unsigned int nrPoints = 600, unsigned int nearestNeighborsNumber = 10) override
+		void Initialize(std::vector<std::string> path, unsigned int nrPoints = 600, unsigned int nearestNeighborsNumber = 10) override
 		{
 			APW::BandStructureBasis::Initialize(path, nrPoints, nearestNeighborsNumber);
 			results.clear();

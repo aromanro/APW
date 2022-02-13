@@ -84,7 +84,6 @@ namespace APW
 					}
 				}
 			);
-
 		}
 		
 		for (auto& task : tasks)
@@ -186,7 +185,6 @@ namespace APW
 					}
 				}
 			);
-
 		}
 
 		for (auto& task : tasks)

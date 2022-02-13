@@ -11,7 +11,6 @@ namespace LAPW {
 	class Integral
 	{
 	public:
-
 		template<typename T> static T Trapezoid(const double delta, const std::vector<T>& values)
 		{
 			assert(values.size() >= 2);
@@ -78,7 +77,6 @@ namespace LAPW {
 
 			return sum * delta * 2. / 45.;
 		}
-
 	};
 
 }

@@ -217,7 +217,6 @@ namespace LAPW
 
 							res[k].push_back(val); 
 						}
-
 					}
 				}
 			);

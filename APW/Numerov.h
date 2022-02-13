@@ -70,8 +70,8 @@ namespace APW {
 		{
 			return true;
 		}
-	protected:
 
+	protected:
 		const Potential& m_pot;
 	};
 

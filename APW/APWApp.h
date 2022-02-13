@@ -23,5 +23,5 @@ class APWApp : public wxApp
 public:
 	APWFrame* frame = nullptr;
 
-	virtual bool OnInit() override;
+	bool OnInit() override;
 };
