@@ -9,6 +9,7 @@
 
 #include "BandStructureBasis.h"
 
+
 namespace APW
 {
 
@@ -35,6 +36,12 @@ namespace APW
 		};
 
 		std::vector<std::vector<double>> Compute(const std::atomic_bool& terminate, const Options& options);
+
+	protected:
+		static bool IsChangeInSign(double posE, double det, double oldDet);
+		static bool IsBlowup(const std::vector<std::vector<double>>& ratios, double posE, int lMax, const std::atomic_bool& terminate);
+		static double LinearInterpolation(double E, double dE, double det, double oldDet);
+		static double QuadraticInterpolation(double E, double dE, double det, double oldDet, double olderDet);
 	};
 
 }

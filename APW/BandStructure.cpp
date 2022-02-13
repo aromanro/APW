@@ -5,7 +5,6 @@
 #include "Numerov.h"
 
 #include "ChemUtils.h"
-#include "Pseudopotential.h"
 
 namespace APW
 {
@@ -45,15 +44,7 @@ namespace APW
 		//assert(success && pseudopotential.GetZ() == 13);
 
 		Potential potential;
-		potential.m_potentialValues.resize(numerovGridNodes);
-		for (int i = 0; i < numerovGridNodes; ++i)
-		{
-			//const double r = i * dr; // for uniform grid
-			const double r = Rp * (exp(i * deltaGrid) - 1.);
-			potential.m_potentialValues[i] = -Pseudopotential::VeffCu(r) / r;
-			//potential.m_potentialValues[i] = pseudopotential.Value(r);
-		}
-
+		InitializePotential(potential, numerovGridNodes, Rp, deltaGrid);
 
 		std::vector<std::future<void>> tasks(options.nrThreads);
 		std::launch launchType = options.nrThreads == 1 ? std::launch::deferred : std::launch::async;
@@ -121,62 +112,27 @@ namespace APW
 						{
 							const double E = minE + posE * dE;
 
-							bool blowup = false;
-							for (int l = 0; l <= lMax && !terminate; ++l)
-							{
-								if (isnan(ratios[posE][l]) || isinf(ratios[posE][l]) || abs(ratios[posE][l]) > 300)
-								{
-									blowup = true;
-									break;
-								}
-							}
-							if (blowup)
+							if (IsBlowup(ratios, posE, lMax, terminate))
 							{
 								oldDet = olderDet = 0;
 								continue;
 							}
 
-
 							secular.ComputeHamiltonian(E, ratios[posE]);
 
 							const double det = secular.Determinant();
 
-							if (posE > 0 && det * oldDet < 0) // change in sign
+							if (IsChangeInSign(posE, det, oldDet))
 							{
 								// linear interpolation
 								const double val = E - dE * det / (det - oldDet);
 
-								if (!isnan(val) && !isinf(val) && val >= E - dE && val <= E)
-									res[k].push_back(val);
-								else
-									res[k].push_back(E - 0.5 * dE);
+								res[k].push_back(LinearInterpolation(E, dE, det, oldDet));
 							}
 							else if (posE > 1 && abs(oldDet) < abs(olderDet) && abs(oldDet) < abs(det) && abs(oldDet) < 1E-15 && // went over a small minimum
 								((olderDet < 0 && oldDet < 0 && det < 0) || (olderDet > 0 && oldDet > 0 && det > 0))) // all have the same sign, otherwise the sign change should be detected
 							{
-								// quadratic interpolation:
-
-								// write the interpolation polynomial out of the three points:
-								// y(x) = y0(x-x1)(x-x2)/((x0-x1)(x0-x2)) + y1(x-x0)(x-x2)/((x1-x0)(x1-x2))+ y2(x-x0)(x-x1)/((x2-x0)(x2-x1)) 
-								// points: (x0, y0) = (E - 2*dE, olderDet), (x1, y1) = (E - dE, oldDet), (x2, y2) = (E, det)
-								// the minimum is where y'(x) = 0 so calculate the derivative of the polynomial, make it equal with 0, solve for x and that's the val
-
-								// TODO: check it, I derived it too fast, might have some mistakes
-								const double coef1 = olderDet * 0.5;
-								const double coef2 = -oldDet;
-								const double coef3 = det * 0.5;
-								
-								//Check:
-								// the interpolation polynomial is:
-								// y(x) = coef1 (x-x1)(x-x2) / dE^2 + coef2 (x-x0)(x-x2) / dE^2+ coef3 (x-x0)(x-x1) / dE^2 
-
-								//const double val = E - dE;
-								const double val = E - 0.5 * dE * (coef1 + 2 * coef2 + 3 * coef3) / (coef1 + coef2 + coef3);
-
-								if (!isnan(val) && !isinf(val) && val >= E - 2 * dE && val <= E)
-									res[k].push_back(val);
-								else
-									res[k].push_back(val - dE);
+								res[k].push_back(QuadraticInterpolation(E, dE, det, oldDet, olderDet));
 							}
 
 							olderDet = oldDet;
@@ -190,7 +146,64 @@ namespace APW
 		for (auto& task : tasks)
 			task.get();
 
-		return std::move(res);
+		return res;
+	}
+
+	bool BandStructure::IsBlowup(const std::vector<std::vector<double>>& ratios, double posE, int lMax, const std::atomic_bool& terminate)
+	{
+		bool blowup = false;
+		for (int l = 0; l <= lMax && !terminate; ++l)
+		{
+			if (isnan(ratios[posE][l]) || isinf(ratios[posE][l]) || abs(ratios[posE][l]) > 300)
+			{
+				blowup = true;
+				break;
+			}
+		}
+
+		return blowup;
+	}
+
+	bool BandStructure::IsChangeInSign(double posE, double det, double oldDet)
+	{
+		return posE > 0 && det * oldDet < 0;
+	}
+
+	double BandStructure::LinearInterpolation(double E, double dE, double det, double oldDet)
+	{
+		const double val = E - dE * det / (det - oldDet);
+
+		if (!isnan(val) && !isinf(val) && val >= E - dE && val <= E)
+			return val;
+
+		return E - 0.5 * dE;		
+	}
+
+	double BandStructure::QuadraticInterpolation(double E, double dE, double det, double oldDet, double olderDet)
+	{
+		// quadratic interpolation:
+
+		// write the interpolation polynomial out of the three points:
+		// y(x) = y0(x-x1)(x-x2)/((x0-x1)(x0-x2)) + y1(x-x0)(x-x2)/((x1-x0)(x1-x2))+ y2(x-x0)(x-x1)/((x2-x0)(x2-x1)) 
+		// points: (x0, y0) = (E - 2*dE, olderDet), (x1, y1) = (E - dE, oldDet), (x2, y2) = (E, det)
+		// the minimum is where y'(x) = 0 so calculate the derivative of the polynomial, make it equal with 0, solve for x and that's the val
+
+		// TODO: check it, I derived it too fast, might have some mistakes
+		const double coef1 = olderDet * 0.5;
+		const double coef2 = -oldDet;
+		const double coef3 = det * 0.5;
+
+		//Check:
+		// the interpolation polynomial is:
+		// y(x) = coef1 (x-x1)(x-x2) / dE^2 + coef2 (x-x0)(x-x2) / dE^2+ coef3 (x-x0)(x-x1) / dE^2 
+
+		//const double val = E - dE;
+		const double val = E - 0.5 * dE * (coef1 + 2 * coef2 + 3 * coef3) / (coef1 + coef2 + coef3);
+
+		if (!isnan(val) && !isinf(val) && val >= E - 2 * dE && val <= E)
+			return val;
+
+		return val - dE;
 	}
 
 }

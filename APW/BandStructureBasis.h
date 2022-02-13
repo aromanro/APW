@@ -5,6 +5,9 @@
 #include "Vector3D.h"
 
 #include "SymmetryPoints.h"
+#include "Pseudopotential.h"
+#include "Numerov.h"
+
 
 namespace APW
 {
@@ -39,6 +42,18 @@ protected:
 	double m_Rmax;
 
 	bool GenerateBasisVectors(unsigned int nearestNeighborsNumber);
+
+	static void InitializePotential(Potential& potential, int numerovGridNodes, double Rp, double deltaGrid)
+	{
+		potential.m_potentialValues.resize(numerovGridNodes);
+		for (int i = 0; i < numerovGridNodes; ++i)
+		{
+			//const double r = i * dr; // for uniform grid
+			const double r = Rp * (exp(i * deltaGrid) - 1.);
+			potential.m_potentialValues[i] = -APW::Pseudopotential::VeffCu(r) / r;
+			//potential.m_potentialValues[i] = pseudopotential.Value(r);
+		}
+	}
 };
 
 }

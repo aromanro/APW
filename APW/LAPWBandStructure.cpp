@@ -65,14 +65,7 @@ namespace LAPW
 
 
 		APW::Potential potential;
-		potential.m_potentialValues.resize(numerovGridNodes);
-		for (int i = 0; i < numerovGridNodes; ++i)
-		{
-			//const double r = i * dr; // for uniform grid
-			const double r = Rp * (exp(i * deltaGrid) - 1.);
-			potential.m_potentialValues[i] = -APW::Pseudopotential::VeffCu(r) / r;
-			//potential.m_potentialValues[i] = pseudopotential.Value(r);
-		}
+		InitializePotential(potential, numerovGridNodes, Rp, deltaGrid);
 
 
 		std::vector<Values> vals(lMax + 1);
@@ -225,7 +218,7 @@ namespace LAPW
 		for (auto& task : tasks)
 			task.get();
 
-		return std::move(res);
+		return res;
 	}
 
 }
