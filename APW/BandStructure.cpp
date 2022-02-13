@@ -124,9 +124,6 @@ namespace APW
 
 							if (IsChangeInSign(posE, det, oldDet))
 							{
-								// linear interpolation
-								const double val = E - dE * det / (det - oldDet);
-
 								res[k].push_back(LinearInterpolation(E, dE, det, oldDet));
 							}
 							else if (posE > 1 && abs(oldDet) < abs(olderDet) && abs(oldDet) < abs(det) && abs(oldDet) < 1E-15 && // went over a small minimum
