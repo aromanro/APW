@@ -129,15 +129,7 @@ namespace APW
 
 							const double det = secular.Determinant();
 
-							if (IsChangeInSign(posE, det, oldDet))
-							{
-								res[k].push_back(LinearInterpolation(E, dE, det, oldDet));
-							}
-							else if (posE > 1 && abs(oldDet) < abs(olderDet) && abs(oldDet) < abs(det) && abs(oldDet) < 1E-15 && // went over a small minimum
-								((olderDet < 0 && oldDet < 0 && det < 0) || (olderDet > 0 && oldDet > 0 && det > 0))) // all have the same sign, otherwise the sign change should be detected
-							{
-								res[k].push_back(QuadraticInterpolation(E, dE, det, oldDet, olderDet));
-							}
+							GetResult(res, ratios, k, E, posE, dE, det, oldDet, olderDet);
 
 							olderDet = oldDet;
 							oldDet = det;
@@ -151,6 +143,18 @@ namespace APW
 			task.get();
 	}
 
+	void BandStructure::GetResult(std::vector<std::vector<double>>& res, const std::vector<std::vector<double>>& ratios, int k, double E, double posE, double dE, double det, double oldDet, double olderDet) const
+	{
+		if (IsChangeInSign(posE, det, oldDet))
+		{
+			res[k].push_back(LinearInterpolation(E, dE, det, oldDet));
+		}
+		else if (posE > 1 && abs(oldDet) < abs(olderDet) && abs(oldDet) < abs(det) && abs(oldDet) < 1E-15 && // went over a small minimum
+			((olderDet < 0 && oldDet < 0 && det < 0) || (olderDet > 0 && oldDet > 0 && det > 0))) // all have the same sign, otherwise the sign change should be detected
+		{
+			res[k].push_back(QuadraticInterpolation(E, dE, det, oldDet, olderDet));
+		}
+	}
 
 	bool BandStructure::IsBlowup(const std::vector<std::vector<double>>& ratios, double posE, int lMax, const std::atomic_bool& terminate)
 	{
