@@ -1,5 +1,3 @@
-#include <future>
-
 #include "BandStructure.h"
 #include "Hamiltonian.h"
 #include "Numerov.h"
@@ -81,12 +79,21 @@ namespace APW
 			task.get();
 
 		// now compute the spectrum for each k point along the path
+		ComputeBandstructure(tasks, res, ratios, numIntervals, minE, dE, lMax, terminate, options);
+
+		return res;
+	}
+
+	void BandStructure::ComputeBandstructure(std::vector<std::future<void>>& tasks, std::vector<std::vector<double>>& res, std::vector<std::vector<double>>& ratios, int numIntervals, double minE, double dE, int lMax, const std::atomic_bool& terminate, const Options& options) const
+	{
+		std::launch launchType = options.nrThreads == 1 ? std::launch::deferred : std::launch::async;
 
 		res.resize(kpoints.size());
-	
-		startPos = 0;
-		step = static_cast<int>(ceil(static_cast<double>(kpoints.size()) / options.nrThreads));
+
+		int startPos = 0;
+		int step = static_cast<int>(ceil(static_cast<double>(kpoints.size()) / options.nrThreads));
 		if (step < 1) step = 1;
+		int nextPos;
 
 		for (int t = 0; t < options.nrThreads; ++t, startPos = nextPos)
 		{
@@ -142,9 +149,8 @@ namespace APW
 
 		for (auto& task : tasks)
 			task.get();
-
-		return res;
 	}
+
 
 	bool BandStructure::IsBlowup(const std::vector<std::vector<double>>& ratios, double posE, int lMax, const std::atomic_bool& terminate)
 	{

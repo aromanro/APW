@@ -1,14 +1,11 @@
 #include "LAPWBandStructure.h"
-
-#include <future>
-
-#include "LAPWBandStructure.h"
-#include "LAPWHamiltonian.h"
 #include "Numerov.h"
 #include "Integral.h"
 
 #include "ChemUtils.h"
 #include "Pseudopotential.h"
+
+#include <future>
 
 namespace LAPW
 {
@@ -175,10 +172,16 @@ namespace LAPW
 
 
 		// now solve the generalized eigenvalue problem for each k
+		ComputeBandstructure(res, vals, lMax, terminate, options);
 
+		return res;
+	}
+
+
+	void BandStructure::ComputeBandstructure(std::vector<std::vector<double>>& res, std::vector<Values>& vals, int lMax, const std::atomic_bool& terminate, const Options& options) const
+	{
 		std::vector<std::future<void>> tasks(options.nrThreads);
 		std::launch launchType = options.nrThreads == 1 ? std::launch::deferred : std::launch::async;
-
 
 		res.resize(kpoints.size());
 
@@ -195,8 +198,8 @@ namespace LAPW
 			if (nextPos > kpoints.size()) nextPos = kpoints.size();
 
 			tasks[t] = std::async(launchType, [this, startPos, nextPos, lMax, &vals, &res, &terminate]()->void
-				{					
-					Hamiltonian hamiltonian(basisVectors, m_Rmax, m_a* m_a* m_a / 4.);
+				{
+					Hamiltonian hamiltonian(basisVectors, m_Rmax, m_a * m_a * m_a / 4.);
 
 					// now, loop over k points
 					for (int k = startPos; k < nextPos && !terminate; ++k)
@@ -208,7 +211,7 @@ namespace LAPW
 							const double val = 0.5 * v(i); // the formulae were with Rydbergs, convert back to Hartrees
 							if (val > 0.8) break;
 
-							res[k].push_back(val); 
+							res[k].push_back(val);
 						}
 					}
 				}
@@ -217,8 +220,5 @@ namespace LAPW
 
 		for (auto& task : tasks)
 			task.get();
-
-		return res;
 	}
-
 }

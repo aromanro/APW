@@ -1,5 +1,6 @@
 #pragma once
 
+#include <future>
 #include <vector>
 #include <atomic>
 
@@ -38,6 +39,8 @@ namespace APW
 		std::vector<std::vector<double>> Compute(const std::atomic_bool& terminate, const Options& options);
 
 	protected:
+		void ComputeBandstructure(std::vector<std::future<void>>& tasks, std::vector<std::vector<double>>& res, std::vector<std::vector<double>>& ratios, int numIntervals, double minE, double dE, int lMax, const std::atomic_bool& terminate, const Options& options) const;
+
 		static bool IsChangeInSign(double posE, double det, double oldDet);
 		static bool IsBlowup(const std::vector<std::vector<double>>& ratios, double posE, int lMax, const std::atomic_bool& terminate);
 		static double LinearInterpolation(double E, double dE, double det, double oldDet);

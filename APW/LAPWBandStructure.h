@@ -4,10 +4,9 @@
 #include <atomic>
 
 #include "Vector3D.h"
-
 #include "Options.h"
-
 #include "BandStructureBasis.h"
+#include "LAPWHamiltonian.h"
 
 namespace LAPW
 {
@@ -39,6 +38,9 @@ namespace LAPW
 		static void NormalizeUniform(std::vector<double>& Psi, double h);
 
 		std::vector<std::vector<double>> Compute(const std::atomic_bool& terminate, const Options& options);
+
+	protected:
+		void ComputeBandstructure(std::vector<std::vector<double>>& res, std::vector<Values>& vals, int lMax, const std::atomic_bool& terminate, const Options& options) const;
 	};
 
 }
