@@ -1,6 +1,8 @@
 # APW
 Augmented Plane Waves (both APW and LAPW), band structure computation
 
+[![CodeFactor](https://www.codefactor.io/repository/github/aromanro/apw/badge)](https://www.codefactor.io/repository/github/aromanro/apw)
+
 Band structure for Cu, using augmented plane waves, the main reference is Computational Physics by Jos Thijssen
 https://www.cambridge.org/core/books/computational-physics/BEE73B0139D4A9993193B57CDC62096E
 
