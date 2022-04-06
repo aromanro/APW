@@ -129,7 +129,7 @@ namespace APW
 
 							const double det = secular.Determinant();
 
-							GetResult(res, ratios, k, E, posE, dE, det, oldDet, olderDet);
+							GetResult(res, k, E, posE, dE, det, oldDet, olderDet);
 
 							olderDet = oldDet;
 							oldDet = det;
@@ -143,7 +143,7 @@ namespace APW
 			task.get();
 	}
 
-	void BandStructure::GetResult(std::vector<std::vector<double>>& res, const std::vector<std::vector<double>>& ratios, int k, double E, double posE, double dE, double det, double oldDet, double olderDet) const
+	void BandStructure::GetResult(std::vector<std::vector<double>>& res, int k, double E, double posE, double dE, double det, double oldDet, double olderDet) const
 	{
 		if (IsChangeInSign(posE, det, oldDet))
 		{

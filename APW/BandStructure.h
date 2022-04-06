@@ -40,7 +40,7 @@ namespace APW
 
 	protected:
 		void ComputeBandstructure(std::vector<std::future<void>>& tasks, std::vector<std::vector<double>>& res, std::vector<std::vector<double>>& ratios, int numIntervals, double minE, double dE, int lMax, const std::atomic_bool& terminate, const Options& options) const;
-		void GetResult(std::vector<std::vector<double>>& res, const std::vector<std::vector<double>>& ratios, int k, double E, double posE, double dE, double det, double oldDet, double olderDet) const;
+		void GetResult(std::vector<std::vector<double>>& res, int k, double E, double posE, double dE, double det, double oldDet, double olderDet) const;
 
 
 		static bool IsChangeInSign(double posE, double det, double oldDet);
