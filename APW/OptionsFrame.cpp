@@ -18,7 +18,7 @@
 wxDECLARE_APP(APWApp);
 
 OptionsFrame::OptionsFrame(const wxString& title, wxWindow* parent)
-	: wxDialog(parent, wxID_ANY, title, wxDefaultPosition, wxSize(400, 290))
+	: wxDialog(parent, wxID_ANY, title, wxDefaultPosition, wxSize(350, 225))
 {
 	CreateControls();
 
@@ -31,9 +31,11 @@ void OptionsFrame::CreateControls()
 	wxBoxSizer* vbox = new wxBoxSizer(wxVERTICAL);
 	SetSizer(vbox);
 
+	vbox->AddSpacer(5);
+
 	// box with margin to contain option controls
 	wxBoxSizer* boxSizer = new wxBoxSizer(wxVERTICAL);
-	vbox->Add(boxSizer, 0, wxALIGN_CENTER_HORIZONTAL | wxGROW | wxALL, 5);
+	vbox->Add(boxSizer, 0, wxGROW, 5);
 
 	// ******************************************************************
 	// now option controls
@@ -41,40 +43,42 @@ void OptionsFrame::CreateControls()
 	// nr threads 
 
 	wxBoxSizer* box = new wxBoxSizer(wxHORIZONTAL);
-	boxSizer->Add(box, 0, wxGROW | wxALL, 5);
+	boxSizer->Add(box, 0, wxGROW, 5);
 
 	wxStaticText* label = new wxStaticText(this, wxID_STATIC, "&Threads:", wxDefaultPosition, wxSize(60, -1), wxALIGN_RIGHT);
-	box->Add(label, 0, wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL | wxALL, 5);
+	box->Add(label, 0, wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL, 5);
 
 	wxString str = wxString::Format(wxT("%i"), options.nrThreads);
 	wxTextCtrl* nrThreadsCtrl = new wxTextCtrl(this, ID_NRTHREADS, str, wxDefaultPosition, wxSize(60, -1), 0);
-	box->Add(nrThreadsCtrl, 0, wxALIGN_CENTER_VERTICAL | wxALL, 5);
+	box->Add(nrThreadsCtrl, 0, wxALIGN_CENTER_VERTICAL, 5);
 
 
-	box->Add(5, 5, 1, wxALIGN_CENTER_VERTICAL | wxALL, 5); // pushes to the right
+	box->Add(5, 5, 1, wxALIGN_CENTER_VERTICAL, 5); // pushes to the right
 
+	box->AddSpacer(5);
+	boxSizer->AddSpacer(5);
 	// next line
 
 	box = new wxBoxSizer(wxHORIZONTAL);
-	boxSizer->Add(box, 0, wxGROW | wxALL, 5);
+	boxSizer->Add(box, 0, wxGROW, 5);
 
 	// nr points
 
 	label = new wxStaticText(this, wxID_STATIC, "Nr. &Points:", wxDefaultPosition, wxSize(60, -1), wxALIGN_RIGHT);
-	box->Add(label, 0, wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL | wxALL, 5);
+	box->Add(label, 0, wxALIGN_LEFT | wxALIGN_CENTER_VERTICAL, 5);
 
 	str = wxString::Format(wxT("%i"), options.nrPoints);
 	wxTextCtrl* nrPointsCtrl = new wxTextCtrl(this, ID_NRPOINTS, str, wxDefaultPosition, wxSize(60, -1), 0);
-	box->Add(nrPointsCtrl, 0, wxGROW | wxALIGN_CENTER_VERTICAL | wxALL, 5);
+	box->Add(nrPointsCtrl, 0, wxGROW | wxALIGN_CENTER_VERTICAL, 5);
 
 
-	box->Add(5, 5, 1, wxALIGN_CENTER_VERTICAL | wxALL, 5); // pushes to the right
+	box->Add(5, 5, 1, wxALIGN_CENTER_VERTICAL, 5); // pushes to the right
 
 
 	// path
 
 	label = new wxStaticText(this, wxID_STATIC, "&Path:", wxDefaultPosition, wxDefaultSize, wxALIGN_RIGHT);
-	box->Add(label, 0, wxALIGN_RIGHT | wxALIGN_CENTER_VERTICAL | wxALL, 5);
+	box->Add(label, 0, wxALIGN_RIGHT | wxALIGN_CENTER_VERTICAL, 5);
 
 	wxString* pathStrings = new wxString[options.paths.size()];
 
@@ -92,18 +96,23 @@ void OptionsFrame::CreateControls()
 
 	wxChoice* pathChoice = new wxChoice(this, ID_PATH, wxDefaultPosition, wxSize(160, -1), options.paths.size(), pathStrings, 0);
 	pathChoice->SetSelection(options.pathNo);
-	box->Add(pathChoice, 0, wxALIGN_CENTER_VERTICAL | wxALL, 5);
+	box->Add(pathChoice, 0, wxALIGN_CENTER_VERTICAL, 5);
 
 	delete[] pathStrings;
 
+	box->AddSpacer(5);
+	boxSizer->AddSpacer(5);
+
 	box = new wxBoxSizer(wxHORIZONTAL);
-	boxSizer->Add(box, 0, wxGROW | wxALL, 5);
+	boxSizer->Add(box, 0, wxGROW, 5);
+
+	box->AddSpacer(5);
 
 	wxArrayString choices;
 	choices.Add("APW");
 	choices.Add("LAPW");
 	wxRadioBox* m_radioBox = new wxRadioBox(this, ID_METHOD, "Method", wxDefaultPosition, wxDefaultSize, choices, 2, wxRA_VERTICAL);
-	box->Add(m_radioBox, 0, wxALIGN_CENTER_VERTICAL | wxALL, 5);
+	box->Add(m_radioBox, 0, wxALIGN_CENTER_VERTICAL, 5);
 
 	// ******************************************************************
 	// setting validators
@@ -127,9 +136,10 @@ void OptionsFrame::CreateControls()
 	// ******************************************************************
 
 	// divider line
+	boxSizer->AddSpacer(5);
 
 	wxStaticLine* line = new wxStaticLine(this, wxID_STATIC, wxDefaultPosition, wxDefaultSize, wxLI_HORIZONTAL);
-	boxSizer->Add(line, 0, wxGROW | wxALL, 5);
+	boxSizer->Add(line, 0, wxGROW, 5);
 
 	// bottom box with ok & cancel buttons
 
