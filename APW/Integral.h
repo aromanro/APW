@@ -122,7 +122,7 @@ namespace LAPW {
 					Rcur[m] = Rcur[m - 1] + (Rcur[m - 1] - Rprev[m - 1]) / (nk - 1); // R(n, m)
 				}
 
-				if (i >= minSteps && fabs(Rcur[i] - Rcur[i - 1]) < err)
+				if (i >= minSteps && fabs(Rcur[i] - Rprev[i - 1]) < err)
 					return Rcur[i];
 
 				Rcur.swap(Rprev);
