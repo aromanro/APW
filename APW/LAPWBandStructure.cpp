@@ -18,10 +18,10 @@ namespace LAPW
 			result2[i] = Psi[i] * Psi[i];
 
 		const double integralForSquare = Integral::Romberg(h, result2);
-		const double norm = sqrt(integralForSquare);
+		const double invnorm = 1. / sqrt(integralForSquare);
 
 		for (int i = 0; i < size; ++i)
-			Psi[i] /= norm;
+			Psi[i] *= invnorm;
 	}
 
 
@@ -40,10 +40,10 @@ namespace LAPW
 		}
 
 		const double integralForSquare = Integral::Romberg(1, result2); // for nonuniform case the step is 1
-		const double norm = sqrt(integralForSquare);
+		const double invnorm = 1. / sqrt(integralForSquare);
 
 		for (int i = 0; i < size; ++i)
-			Psi[i] /= norm;
+			Psi[i] *= invnorm;
 	}
 
 	std::vector<std::vector<double>> BandStructure::Compute(const std::atomic_bool& terminate, const Options& options)
