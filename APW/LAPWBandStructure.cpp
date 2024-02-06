@@ -17,7 +17,7 @@ namespace LAPW
 		for (int i = 0; i < size; ++i)
 			result2[i] = Psi[i] * Psi[i];
 
-		const double integralForSquare = Integral::Romberg(h, result2);
+		const double integralForSquare = Integral::Simpson38(h, result2);
 		const double invnorm = 1. / sqrt(integralForSquare);
 
 		for (int i = 0; i < size; ++i)
@@ -39,7 +39,7 @@ namespace LAPW
 			result2[i] *= cnst;
 		}
 
-		const double integralForSquare = Integral::Romberg(1, result2); // for nonuniform case the step is 1
+		const double integralForSquare = Integral::Simpson38(1, result2); // for nonuniform case the step is 1
 		const double invnorm = 1. / sqrt(integralForSquare);
 
 		for (int i = 0; i < size; ++i)
@@ -126,7 +126,7 @@ namespace LAPW
 				uudot[i] = u[i] * udot[i] * cnst;
 			}
 
-			const double alpha = Integral::Romberg(1/*dr*/, uudot);
+			const double alpha = Integral::Simpson38(1/*dr*/, uudot);
 			for (int i = 0; i < size; ++i)
 				udot[i] -= alpha * u[i];
 
@@ -142,7 +142,7 @@ namespace LAPW
 				const double cnst = Rp * deltaGrid * exp(deltaGrid * i);
 				udotu[i] = udot[i] * u[i] * cnst;
 			}
-			const double sum = Integral::Romberg(1, udotu); // should be very close to zero
+			const double sum = Integral::Simpson38(1, udotu); // should be very close to zero
 			*/
 
 			// the formulae were derived with Rydberg atomic units, but the program uses Hartrees, so convert the derivatives to use Rydbergs for formulae
@@ -164,7 +164,7 @@ namespace LAPW
 			}
 				
 			// the 0.25 is for the same reason as 0.5 above
-			vals[l].Nl = 0.25 * Integral::Romberg(1/*dr*/, udot);
+			vals[l].Nl = 0.25 * Integral::Simpson38(1/*dr*/, udot);
 
 			// should be 1, see 6.50 - but if you choose to go further with relations derived for Hartree atomic units, should be 2 (this comes out of the 1/2 of the kinetic term of the Schrodinger eqn).
 			//const double val = m_Rmax * m_Rmax * (vals[l].RadialDerivative * vals[l].EnergyDerivative - vals[l].Wavefunction * vals[l].BothDerivative); 		
@@ -197,7 +197,7 @@ namespace LAPW
 
 			if (nextPos > kpoints.size()) nextPos = kpoints.size();
 
-			tasks[t] = std::async(launchType, [this, startPos, nextPos, lMax, &vals, &res, &terminate]()->void
+			tasks[t] = std::async(launchType, [this, startPos, nextPos, lMax, &vals, &res, &terminate]()
 				{
 					Hamiltonian hamiltonian(basisVectors, m_Rmax, m_a * m_a * m_a / 4.);
 
