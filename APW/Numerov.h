@@ -71,7 +71,7 @@ namespace APW {
 			return true;
 		}
 
-	protected:
+	private:
 		const Potential& m_pot;
 	};
 
@@ -408,7 +408,7 @@ namespace APW {
 
 		NumerovFunction function;
 
-	protected:
+	private:
 		// 2.13
 		inline double getU(double w, double funcVal) const
 		{

@@ -57,7 +57,7 @@ class APWFrame : public wxFrame
 {
 public:
 	APWFrame(const wxString& title, const wxPoint& pos, const wxSize& size);
-	~APWFrame();
+	~APWFrame() override;
 
 	std::atomic_int runningThreads;
 

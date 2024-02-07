@@ -57,8 +57,8 @@ namespace APW
 				for (size_t j = 0; j <= i; ++j)
 				{
 					// compute B
-					const Vector3D<double> qi = m_basisVectors[i] + k;
-					const Vector3D<double> qj = m_basisVectors[j] + k;
+					const Vector3D qi(m_basisVectors[i] + k);
+					const Vector3D qj(m_basisVectors[j] + k);
 					const double qiqjscalar = qi * qj;
 
 					B(i, j) = B(j, i) = OverlapInterstitialHalf(i, j) * qiqjscalar;

@@ -39,7 +39,7 @@ namespace LAPW
 
 		std::vector<std::vector<double>> Compute(const std::atomic_bool& terminate, const Options& options);
 
-	protected:
+	private:
 		void ComputeBandstructure(std::vector<std::vector<double>>& res, std::vector<Values>& vals, int lMax, const std::atomic_bool& terminate, const Options& options) const;
 	};
 

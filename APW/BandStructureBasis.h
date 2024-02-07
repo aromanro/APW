@@ -23,7 +23,6 @@ public:
 	BandStructureBasis(double a = 6.8219117 /*4.046 / 0.5291772106712*/, double rmax = -1. /*sqrt(2.) * 4.046 / 0.5291772106712 / 4. * 0.39*/); // commented out, some 'experimental' values for Al
 
 	SymmetryPoints symmetryPoints;
-
 	std::vector<unsigned int> symmetryPointsPositions;
 
 	virtual void Initialize(std::vector<std::string> path, unsigned int nrPoints = 600, unsigned int nearestNeighborsNumber = 10);
@@ -31,13 +30,11 @@ public:
 	unsigned int GetPointsNumber() const { return static_cast<unsigned int>(kpoints.size()); }
 
 	const std::vector<std::string>& GetPath() const { return m_path; }
+
 protected:
 	std::vector<std::string> m_path;
-
 	std::vector<Vector3D<double>> basisVectors;
-
 	std::vector<Vector3D<double>> kpoints;
-
 	double m_a;
 	double m_Rmax;
 

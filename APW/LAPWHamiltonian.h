@@ -106,8 +106,8 @@ namespace LAPW
 			{
 				for (size_t j = 0; j <= i; ++j)
 				{
-					const Vector3D<double> qi = m_basisVectors[i] + k;
-					const Vector3D<double> qj = m_basisVectors[j] + k;
+					const Vector3D qi(m_basisVectors[i] + k);
+					const Vector3D qj(m_basisVectors[j] + k);
 					const double qiqjscalar = qi * qj;
 					const double qi2 = qi * qi;
 					const double qj2 = qj * qj;
@@ -128,9 +128,7 @@ namespace LAPW
 					{
 						const double twolp1 = 2. * l + 1.;
 						const double p = SpecialFunctions::Legendre::p(l, cosTheta);
-						double sl;
-						double gammal;
-						std::tie(sl, gammal) = vals[l].ComputeSlGammal(l, m_R, qi, qj);
+						auto [sl, gammal] = vals[l].ComputeSlGammal(l, m_R, qi, qj);
 
 						s += twolp1 * p * sl;
 
@@ -167,7 +165,7 @@ namespace LAPW
 		}
 
 
-	protected:
+	private:
 		// technically the basis vectors are Ki + k, those here are only Ki
 		const std::vector<Vector3D<double>>& m_basisVectors;
 		const double m_R;

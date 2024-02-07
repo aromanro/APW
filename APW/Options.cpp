@@ -24,8 +24,7 @@ Options::Options()
 			{"G", "X", "W", "K", "G", "L", "U", "W", "L", "K"},
 			{"G", "X", "U", "K", "G", "L", "W", "X"},
 		} },
-	method(1),
-	m_fileconfig(nullptr)
+	method(1)
 {
 }
 
@@ -33,12 +32,12 @@ void Options::Open()
 {
 	if (m_fileconfig) return;
 
-	wxString dir = wxStandardPaths::Get().GetConfigDir() + wxFileName::GetPathSeparator();
+	const wxString dir = wxStandardPaths::Get().GetConfigDir() + wxFileName::GetPathSeparator();
 
 	if(!wxFileName::DirExists(dir))
 		wxFileName::Mkdir(dir, 0777, wxPATH_MKDIR_FULL);
 
-	wxString iniFilePath = dir + "APW.ini";
+	const wxString iniFilePath = dir + "APW.ini";
 
 	m_fileconfig = new wxFileConfig("APW", wxEmptyString, iniFilePath);
 
