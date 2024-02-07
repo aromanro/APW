@@ -48,8 +48,8 @@ void Options::Open()
 void Options::Close()
 {
 	delete m_fileconfig;
-	m_fileconfig = NULL;
-	wxConfigBase::Set(NULL);
+	m_fileconfig = nullptr;
+	wxConfigBase::Set(nullptr);
 }
 
 void Options::Load()
