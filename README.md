@@ -9,6 +9,15 @@ https://www.cambridge.org/core/books/computational-physics/BEE73B0139D4A9993193B
 
 Description is on Computational Physics Blog: https://compphys.go.ro/augmented-plane-waves/
 
+### TOOLS
+
+The project compiles on Windows with Visual Studio 2026 (the code can be compiled with older versions starting with VS 2015, but it's currently maintained with VS 2026 and C++ 17 or higher).
+
+### LIBRARIES
+
+The program requires the typical VC++ runtime libraries.
+Additional libraries needed are VTK https://vtk.org/ and wxWidgets https://wxwidgets.org/.
+
 ### PROGRAM IN ACTION
 
 [![Program video](https://img.youtube.com/vi/4qOcv9kfnYw/0.jpg)](https://youtu.be/4qOcv9kfnYw)
